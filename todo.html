@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #ffe5ec;
+    --bg-2: #ffd1dc;
+    --ink: #8b3a5a;
+    --accent: #ff8fab;
+    --soft-solid: #fff7f9;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Pixelify Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 14px;
+  }
+
+  .todo-widget {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, var(--bg-1), var(--bg-2));
+    border: 4px solid var(--ink);
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 var(--ink),
+      0 10px 22px rgba(139, 58, 90, 0.15);
+    padding: 16px;
+    position: relative;
+  }
+
+  /* Corner sparkles */
+  .sparkle-deco {
+    position: absolute;
+    color: var(--ink);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .sparkle-deco.tl { top: 6px; left: 10px; font-size: 10px; }
+  .sparkle-deco.tr { top: 6px; right: 10px; font-size: 12px; }
+  .sparkle-deco.bl { bottom: 6px; left: 10px; font-size: 8px; }
+  .sparkle-deco.br { bottom: 6px; right: 10px; font-size: 9px; }
+
+  /* ----- HEADER ----- */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  .title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+  }
+  .title-heart {
+    display: inline-block;
+    color: var(--accent);
+    margin-left: 4px;
+    animation: heartbeat 1.8s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    20% { transform: scale(1.18); }
+    40% { transform: scale(1); }
+  }
+  .counter {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--ink);
+    opacity: 0.7;
+    letter-spacing: 1px;
+  }
+
+  /* ----- TASK LIST ----- */
+  .tasks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 340px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  .tasks::-webkit-scrollbar { width: 8px; }
+  .tasks::-webkit-scrollbar-track { background: transparent; }
+  .tasks::-webkit-scrollbar-thumb {
+    background: var(--ink);
+    border-radius: 4px;
+    opacity: 0.3;
+  }
+
+  .task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--soft-solid);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 0 var(--ink);
+    transition: opacity 0.2s ease;
+  }
+  .task.done { opacity: 0.55; }
+
+  /* Custom pixel-y checkbox */
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--ink);
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .checkbox:hover { background: var(--bg-1); }
+  .checkbox.checked { background: var(--accent); }
+  .checkbox.checked::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 8px;
+    width: 4px; height: 9px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+  }
+  .checkbox:active { transform: scale(0.92); }
+
+  .task-text {
+    flex: 1;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    word-break: break-word;
+    line-height: 1.3;
+  }
+  .task.done .task-text {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--ink);
+    opacity: 0.35;
+    cursor: pointer;
+    padding: 4px 6px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: 6px;
+  }
+  .delete-btn:hover {
+    opacity: 1;
+    color: #c44464;
+  }
+
+  /* ----- ADD INPUT ----- */
+  .add-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .add-input {
+    flex: 1;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 8px 12px;
+    outline: none;
+    box-shadow: 0 2px 0 var(--ink);
+    transition: border-color 0.15s ease;
+    min-width: 0;
+  }
+  .add-input::placeholder {
+    color: var(--ink);
+    opacity: 0.45;
+  }
+  .add-input:focus {
+    border-color: var(--accent);
+  }
+  .add-btn {
+    width: 38px;
+    height: 38px;
+    background: var(--accent);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    color: white;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--ink);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .add-btn:hover { transform: translateY(-1px); }
+  .add-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+
+  /* ----- EMPTY STATE ----- */
+  .empty {
+    text-align: center;
+    padding: 26px 10px 18px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    opacity: 0.55;
+    font-weight: 700;
+  }
+  .empty .icon {
+    font-size: 32px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* ----- CELEBRATION ----- */
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-1.5deg); }
+    75% { transform: rotate(1.5deg); }
+  }
+  .todo-widget.celebrate {
+    animation: wiggle 0.5s ease;
+  }
+  .sparkle-burst {
+    position: absolute;
+    font-size: 16px;
+    pointer-events: none;
+    animation: sparkleOut 0.9s ease-out forwards;
+    z-index: 5;
+  }
+  @keyframes sparkleOut {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+    50% { opacity: 1; }
+    100% {
+      transform:
+        translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+        scale(1.4) rotate(180deg);
+      opacity: 0;
+    }
+  }
+  .all-done-banner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: white;
+    text-shadow:
+      2px 2px 0 var(--ink),
+      -1px -1px 0 var(--ink),
+      1px -1px 0 var(--ink),
+      -1px 1px 0 var(--ink);
+    z-index: 6;
+    pointer-events: none;
+    animation: bannerPop 1.4s ease-out forwards;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+  @keyframes bannerPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+    35% { transform: translate(-50%, -50%) scale(1); }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -100%) scale(1); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="todo-widget" id="widget">
+  <span class="sparkle-deco tl">✦</span>
+  <span class="sparkle-deco tr">✧</span>
+  <span class="sparkle-deco bl">✦</span>
+  <span class="sparkle-deco br">✧</span>
+
+  <div class="header">
+    <div class="title">
+      <span id="title">TO-DO</span><span class="title-heart">♥</span>
+    </div>
+    <div class="counter" id="counter">0/0</div>
+  </div>
+
+  <ul class="tasks" id="tasks"></ul>
+
+  <div class="add-row">
+    <input type="text" class="add-input" id="addInput" placeholder="add a task..." maxlength="120" />
+    <button class="add-btn" id="addBtn" aria-label="Add task">+</button>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  // ---------- Theme ----------
+  const colorParam = params.get('color') || 'rose';
+  const themes = {
+    rose:      { bg1: '#ffe5ec', bg2: '#ffd1dc', ink: '#8b3a5a', accent: '#ff8fab' },
+    mint:      { bg1: '#e0f5e9', bg2: '#c5ebd1', ink: '#2d6a4f', accent: '#74c69d' },
+    butter:    { bg1: '#fff4d2', bg2: '#ffe8a8', ink: '#9a6a1f', accent: '#f4b942' },
+    sky:       { bg1: '#dbeefe', bg2: '#bcdffb', ink: '#2c5282', accent: '#63a4e0' },
+    lavender:  { bg1: '#ede2ff', bg2: '#dcc8fc', ink: '#5b3a8e', accent: '#a78bfa' },
+    bubblegum: { bg1: '#ffd6eb', bg2: '#ffb3d9', ink: '#a83464', accent: '#ec4899' },
+    peach:     { bg1: '#ffe4cc', bg2: '#ffcfa3', ink: '#a04a1f', accent: '#fb923c' },
+    sage:      { bg1: '#e8f0e0', bg2: '#cfdfba', ink: '#556b2f', accent: '#9caf88' },
+  };
+  const theme = themes[colorParam] || themes.rose;
+  const root = document.documentElement.style;
+  root.setProperty('--bg-1', theme.bg1);
+  root.setProperty('--bg-2', theme.bg2);
+  root.setProperty('--ink', theme.ink);
+  root.setProperty('--accent', theme.accent);
+
+  // ---------- Title ----------
+  const titleParam = params.get('title');
+  if (titleParam) {
+    document.getElementById('title').textContent = decodeURIComponent(titleParam).toUpperCase();
+  }
+
+  // ---------- Storage ----------
+  const keyParam = params.get('key') || 'default';
+  const STORAGE_KEY = 'todo:' + keyParam;
+
+  let tasks = [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) tasks = JSON.parse(stored);
+  } catch (e) { tasks = []; }
+
+  const tasksEl = document.getElementById('tasks');
+  const counterEl = document.getElementById('counter');
+  const widgetEl = document.getElementById('widget');
+  const addInput = document.getElementById('addInput');
+  const addBtn = document.getElementById('addBtn');
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch (e) {}
+  }
+
+  function render() {
+    if (tasks.length === 0) {
+      tasksEl.innerHTML = '<li class="empty"><span class="icon">✨</span>no tasks yet!</li>';
+    } else {
+      tasksEl.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task' + (task.done ? ' done' : '');
+
+        const checkbox = document.createElement('div');
+        checkbox.className = 'checkbox' + (task.done ? ' checked' : '');
+        checkbox.setAttribute('role', 'checkbox');
+        checkbox.setAttribute('aria-checked', task.done);
+        checkbox.tabIndex = 0;
+        checkbox.addEventListener('click', () => toggleTask(task.id));
+        checkbox.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            toggleTask(task.id);
+          }
+        });
+
+        const text = document.createElement('span');
+        text.className = 'task-text';
+        text.textContent = task.text;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.setAttribute('aria-label', 'Delete task');
+        deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+        li.appendChild(checkbox);
+        li.appendChild(text);
+        li.appendChild(deleteBtn);
+        tasksEl.appendChild(li);
+      });
+    }
+
+    const done = tasks.filter(t => t.done).length;
+    counterEl.textContent = done + '/' + tasks.length;
+  }
+
+  function addTask(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    tasks.push({
+      id: 't_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      text: trimmed,
+      done: false
+    });
+    save();
+    render();
+  }
+
+  function toggleTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const wasAllDone = tasks.length > 0 && tasks.every(t => t.done);
+    task.done = !task.done;
+    save();
+    render();
+    const isAllDone = tasks.length > 0 && tasks.every(t => t.done);
+    if (isAllDone && !wasAllDone) celebrate();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save();
+    render();
+  }
+
+  function celebrate() {
+    widgetEl.classList.remove('celebrate');
+    void widgetEl.offsetWidth;
+    widgetEl.classList.add('celebrate');
+
+    // Sparkle burst
+    const symbols = ['✦', '✧', '⋆', '✨', '★', '♥'];
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle-burst';
+      s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      s.style.color = theme.accent;
+      s.style.left = '50%';
+      s.style.top = '50%';
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+      const dist = 80 + Math.random() * 50;
+      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      widgetEl.appendChild(s);
+      setTimeout(() => s.remove(), 900);
+    }
+
+    // "ALL DONE!" banner
+    const banner = document.createElement('div');
+    banner.className = 'all-done-banner';
+    banner.textContent = 'ALL DONE!';
+    widgetEl.appendChild(banner);
+    setTimeout(() => banner.remove(), 1400);
+  }
+
+  // ---------- Events ----------
+  addBtn.addEventListener('click', () => {
+    addTask(addInput.value);
+    addInput.value = '';
+    addInput.focus();
+  });
+  addInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      addTask(addInput.value);
+      addInput.value = '';
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
