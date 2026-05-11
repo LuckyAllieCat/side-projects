@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TV ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #ffe5ec;
+    --bg-2: #ffd1dc;
+    --ink: #8b3a5a;
+    --accent: #ff8fab;
+    --soft: rgba(255,255,255,0.85);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Pixelify Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 14px;
+  }
+
+  .tv-widget {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* ----- TITLE ----- */
+  .label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    text-align: center;
+    color: var(--ink);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .label .heart {
+    color: var(--accent);
+    font-size: 13px;
+    text-shadow: none;
+    animation: heartbeat 1.6s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    20% { transform: scale(1.18); }
+    40% { transform: scale(1); }
+  }
+
+  /* ----- ANTENNAS ----- */
+  .antennas {
+    text-align: center;
+    height: 28px;
+    margin-bottom: -5px;
+    position: relative;
+    z-index: 0;
+  }
+  .antennas svg {
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* ----- TV BODY ----- */
+  .tv {
+    background: linear-gradient(145deg, var(--bg-1), var(--bg-2));
+    border: 4px solid var(--ink);
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 var(--ink),
+      0 10px 22px rgba(139, 58, 90, 0.15);
+    padding: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Corner sparkles (consistent with other widgets) */
+  .sparkle-deco {
+    position: absolute;
+    color: var(--ink);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .sparkle-deco.tl { top: 6px; left: 10px; font-size: 10px; }
+  .sparkle-deco.tr { top: 6px; right: 10px; font-size: 12px; }
+  .sparkle-deco.bl { bottom: 6px; left: 10px; font-size: 8px; }
+  .sparkle-deco.br { bottom: 6px; right: 10px; font-size: 9px; }
+
+  /* ----- SCREEN ----- */
+  .screen-frame {
+    background: #1a1825;
+    border: 3px solid var(--ink);
+    border-radius: 10px;
+    padding: 5px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .screen {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .screen iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  /* No-video placeholder ("NO SIGNAL" with TV static) */
+  .no-video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.04) 2px, rgba(255,255,255,0.04) 3px),
+      linear-gradient(135deg, #2a2a3a, #1a1a25);
+    color: rgba(255,255,255,0.75);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    text-align: center;
+    padding: 16px;
+    line-height: 1.8;
+  }
+  .no-video .icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+  }
+
+  /* ----- CONTROLS STRIP ----- */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 6px;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .speaker {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+  .speaker-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: 0.45;
+  }
+  .led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    margin-right: 6px;
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); }
+    50% { opacity: 0.55; box-shadow: 0 0 3px var(--accent); }
+  }
+  .knobs {
+    display: flex;
+    gap: 8px;
+  }
+  .knob {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--soft);
+    border: 2px solid var(--ink);
+    position: relative;
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    width: 2px;
+    height: 5px;
+    margin-left: -1px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  .knob.k2::after {
+    transform: rotate(60deg);
+    transform-origin: center 7px;
+  }
+</style>
+</head>
+<body>
+<div class="tv-widget" id="widget">
+  <!-- Title above the TV -->
+  <div class="label">
+    <span class="heart">♥</span>
+    <span id="title">NOW PLAYING</span>
+    <span class="heart">♥</span>
+  </div>
+
+  <!-- Antennas -->
+  <div class="antennas">
+    <svg width="140" height="28" viewBox="0 0 140 28" xmlns="http://www.w3.org/2000/svg">
+      <line x1="60" y1="28" x2="22" y2="6" stroke="currentColor" style="stroke: var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="22" cy="5" r="4" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+      <line x1="80" y1="28" x2="118" y2="6" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="118" cy="5" r="4" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- TV body -->
+  <div class="tv">
+    <span class="sparkle-deco tl">✦</span>
+    <span class="sparkle-deco tr">✧</span>
+    <span class="sparkle-deco bl">✦</span>
+    <span class="sparkle-deco br">✧</span>
+
+    <div class="screen-frame">
+      <div class="screen" id="screen">
+        <!-- iframe injected here via JS -->
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="speaker">
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+        <span class="speaker-dot"></span>
+      </div>
+      <div class="led" title="Power"></div>
+      <div class="knobs">
+        <div class="knob"></div>
+        <div class="knob k2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  // ---------- Theme ----------
+  const colorParam = params.get('color') || 'rose';
+  const themes = {
+    rose:      { bg1: '#ffe5ec', bg2: '#ffd1dc', ink: '#8b3a5a', accent: '#ff8fab' },
+    mint:      { bg1: '#e0f5e9', bg2: '#c5ebd1', ink: '#2d6a4f', accent: '#74c69d' },
+    butter:    { bg1: '#fff4d2', bg2: '#ffe8a8', ink: '#9a6a1f', accent: '#f4b942' },
+    sky:       { bg1: '#dbeefe', bg2: '#bcdffb', ink: '#2c5282', accent: '#63a4e0' },
+    lavender:  { bg1: '#ede2ff', bg2: '#dcc8fc', ink: '#5b3a8e', accent: '#a78bfa' },
+    bubblegum: { bg1: '#ffd6eb', bg2: '#ffb3d9', ink: '#a83464', accent: '#ec4899' },
+    peach:     { bg1: '#ffe4cc', bg2: '#ffcfa3', ink: '#a04a1f', accent: '#fb923c' },
+    sage:      { bg1: '#e8f0e0', bg2: '#cfdfba', ink: '#556b2f', accent: '#9caf88' },
+  };
+  const theme = themes[colorParam] || themes.rose;
+  const root = document.documentElement.style;
+  root.setProperty('--bg-1', theme.bg1);
+  root.setProperty('--bg-2', theme.bg2);
+  root.setProperty('--ink', theme.ink);
+  root.setProperty('--accent', theme.accent);
+
+  // ---------- Title ----------
+  const titleParam = params.get('title');
+  if (titleParam) {
+    document.getElementById('title').textContent = decodeURIComponent(titleParam).toUpperCase();
+  }
+
+  // ---------- Video ID extraction ----------
+  // Accepts: bare 11-char ID, full youtube.com/watch?v=, youtu.be/, or youtube.com/embed/ URLs
+  function extractVideoId(input) {
+    if (!input) return null;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+    let m = input.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    if (m) return m[1];
+    m = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if (m) return m[1];
+    m = input.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+    if (m) return m[1];
+    return null;
+  }
+
+  const videoParam = params.get('v');
+  const videoId = extractVideoId(videoParam);
+
+  const screenEl = document.getElementById('screen');
+  if (videoId) {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+    iframe.title = 'YouTube video';
+    iframe.setAttribute('allow', 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    iframe.setAttribute('allowfullscreen', 'true');
+    screenEl.appendChild(iframe);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'no-video';
+    placeholder.innerHTML = `
+      <div class="icon">📺</div>
+      NO SIGNAL<br>
+      ADD ?V=VIDEO_ID<br>
+      TO THE URL
+    `;
+    screenEl.appendChild(placeholder);
+  }
+</script>
+</body>
+</html>
