@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tavla ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --board-bg: #d9a574;       /* warm wood */
+    --board-dark: #8b5a3c;     /* dark wood frame */
+    --board-edge: #5c3a24;     /* darkest wood edge */
+    --red: #c0392b;            /* tavla red */
+    --red-dark: #7a2418;
+    --red-soft: #ffd9d2;
+    --cream: #f5ebd6;          /* tavla cream */
+    --cream-dark: #a08d6a;
+    --cream-soft: #fffaef;
+    --ink: #3a2818;
+    --bg-soft: #fff7ea;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Pixelify Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 14px;
+  }
+
+  /* ===== OUTER FRAME ===== */
+  .tavla-widget {
+    width: 100%;
+    max-width: 520px;
+    background: linear-gradient(145deg, #fff5e1, #f5e6c8);
+    border: 4px solid var(--ink);
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 var(--ink),
+      0 10px 22px rgba(58, 40, 24, 0.2);
+    padding: 14px 12px 16px;
+    position: relative;
+  }
+
+  .sparkle-deco {
+    position: absolute;
+    color: var(--ink);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .sparkle-deco.tl { top: 6px; left: 10px; font-size: 10px; }
+  .sparkle-deco.tr { top: 6px; right: 10px; font-size: 12px; }
+  .sparkle-deco.bl { bottom: 6px; left: 10px; font-size: 8px; }
+  .sparkle-deco.br { bottom: 6px; right: 10px; font-size: 9px; }
+
+  /* ===== TITLE ===== */
+  .label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    text-align: center;
+    color: var(--ink);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .dice {
+    display: inline-block;
+    color: var(--red);
+    font-size: 13px;
+  }
+  .target {
+    font-size: 8px;
+    opacity: 0.7;
+    margin-left: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* ===== MAIN ROW (player + board + player) ===== */
+  .main-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* ===== PLAYER PANEL ===== */
+  .player {
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 3px 0 var(--ink);
+    text-align: center;
+    min-height: 180px;
+    position: relative;
+    overflow: hidden;
+  }
+  .player.left {
+    background: linear-gradient(160deg, var(--red-soft), #f5b8ad);
+  }
+  .player.right {
+    background: linear-gradient(160deg, var(--cream-soft), #ebd9b3);
+  }
+  .player.winner {
+    animation: winner-pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes winner-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+
+  .player-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .player.left .player-name { color: var(--red-dark); }
+  .player.right .player-name { color: #6b5a3c; }
+
+  /* Checker — pixel-style circle stack */
+  .checker-wrap {
+    margin: 4px 0;
+  }
+  .checker {
+    width: 44px;
+    height: 44px;
+    display: block;
+  }
+
+  .score {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px;
+    color: var(--ink);
+    margin: 4px 0;
+    text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+    font-variant-numeric: tabular-nums;
+  }
+  .player.left .score { color: var(--red-dark); }
+  .player.right .score { color: #6b5a3c; }
+
+  /* Win pips */
+  .pips {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .pip {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    transition: background 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .player.left .pip.filled { background: var(--red); transform: scale(1.15); }
+  .player.right .pip.filled { background: var(--cream); transform: scale(1.15); }
+
+  /* Buttons */
+  .player-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .pbtn {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--ink);
+    border-radius: 7px;
+    background: rgba(255,255,255,0.7);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--ink);
+    transition: transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .player.left .pbtn.plus { background: var(--red); color: white; }
+  .player.right .pbtn.plus { background: var(--cream-dark); color: white; }
+  .pbtn:hover { transform: translateY(-1px); }
+  .pbtn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+  .pbtn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: 0 2px 0 var(--ink); }
+
+  /* ===== BOARD ===== */
+  .board {
+    background: var(--board-bg);
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 0 0 2px var(--board-edge),
+      0 3px 0 var(--ink);
+    padding: 4px;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .board svg {
+    display: block;
+    width: 160px;
+    height: 180px;
+    shape-rendering: crispEdges;
+  }
+
+  /* ===== RESET BAR ===== */
+  .footer-bar {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+  }
+  .matches {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--ink);
+    opacity: 0.7;
+    letter-spacing: 1px;
+  }
+  .reset-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    background: transparent;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 5px 9px;
+    color: var(--ink);
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 2px 0 var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reset-btn:hover { background: rgba(58, 40, 24, 0.1); }
+  .reset-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+
+  /* ===== WIN BANNER ===== */
+  .win-banner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    color: white;
+    z-index: 10;
+    pointer-events: none;
+    animation: bannerPop 2s ease-out forwards;
+    white-space: nowrap;
+    letter-spacing: 2px;
+    padding: 14px 22px;
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .win-banner.red { background: var(--red); }
+  .win-banner.cream { background: var(--cream-dark); }
+  @keyframes bannerPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    25% { transform: translate(-50%, -50%) scale(1); }
+    85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+
+  .sparkle-burst {
+    position: absolute;
+    font-size: 18px;
+    pointer-events: none;
+    animation: sparkleOut 1.1s ease-out forwards;
+    z-index: 9;
+  }
+  @keyframes sparkleOut {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+    50% { opacity: 1; }
+    100% {
+      transform:
+        translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+        scale(1.4) rotate(180deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="tavla-widget" id="widget">
+  <span class="sparkle-deco tl">✦</span>
+  <span class="sparkle-deco tr">✧</span>
+  <span class="sparkle-deco bl">✦</span>
+  <span class="sparkle-deco br">✧</span>
+
+  <div class="label">
+    <span class="dice">⚀</span>
+    <span>TAVLA SCORE</span>
+    <span class="dice">⚅</span>
+    <span class="target">FIRST TO 5</span>
+  </div>
+
+  <div class="main-row">
+    <!-- LEFT PLAYER (RED / AMW) -->
+    <div class="player left" id="playerLeft">
+      <div class="player-name">ALLIE MAE</div>
+      <div class="checker-wrap" id="leftChecker"></div>
+      <div class="score" id="leftScore">0</div>
+      <div class="pips" id="leftPips"></div>
+      <div class="player-buttons">
+        <button class="pbtn minus" id="leftMinus" aria-label="Subtract point">−</button>
+        <button class="pbtn plus" id="leftPlus" aria-label="Add point">+</button>
+      </div>
+    </div>
+
+    <!-- BOARD -->
+    <div class="board" id="board"></div>
+
+    <!-- RIGHT PLAYER (CREAM / BY) -->
+    <div class="player right" id="playerRight">
+      <div class="player-name">BERK</div>
+      <div class="checker-wrap" id="rightChecker"></div>
+      <div class="score" id="rightScore">0</div>
+      <div class="pips" id="rightPips"></div>
+      <div class="player-buttons">
+        <button class="pbtn minus" id="rightMinus" aria-label="Subtract point">−</button>
+        <button class="pbtn plus" id="rightPlus" aria-label="Add point">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="matches" id="matches">MATCHES: 0</div>
+    <button class="reset-btn" id="resetBtn">NEW MATCH</button>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  // ---------- Config ----------
+  const target = parseInt(params.get('target')) || 5;
+  const leftName = (params.get('left') || 'Allie Mae').toUpperCase();
+  const rightName = (params.get('right') || 'Berk').toUpperCase();
+  const storageKey = 'tavla:' + (params.get('key') || 'default');
+
+  document.querySelector('#playerLeft .player-name').textContent = leftName;
+  document.querySelector('#playerRight .player-name').textContent = rightName;
+  document.querySelector('.target').textContent = 'FIRST TO ' + target;
+
+  // ---------- State ----------
+  let state = { left: 0, right: 0, matches: 0 };
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (stored) state = Object.assign(state, JSON.parse(stored));
+  } catch (e) {}
+
+  function save() {
+    try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (e) {}
+  }
+
+  // ---------- Pixel TAVLA BOARD (SVG, drawn fresh on each render) ----------
+  // Real tavla board: 12 triangles top, 12 bottom, central bar splits left/right halves
+  function buildBoard() {
+    const W = 80;   // viewBox width (wider so triangles render wider)
+    const H = 90;   // viewBox height
+    const TRI_H = 28;
+    const POINTS_PER_HALF = 6;
+    const barX = W / 2;
+    const barW = 4;
+    const innerW = (W - barW) / 2 - 2;
+    const triW = innerW / POINTS_PER_HALF;
+
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+
+    // Background
+    svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="#d9a574"/>`;
+    // Outer dark frame
+    svg += `<rect x="0" y="0" width="${W}" height="2" fill="#5c3a24"/>`;
+    svg += `<rect x="0" y="${H - 2}" width="${W}" height="2" fill="#5c3a24"/>`;
+    svg += `<rect x="0" y="0" width="2" height="${H}" fill="#5c3a24"/>`;
+    svg += `<rect x="${W - 2}" y="0" width="2" height="${H}" fill="#5c3a24"/>`;
+
+    // Top row of triangles
+    for (let i = 0; i < 12; i++) {
+      const side = i < 6 ? 'left' : 'right';
+      const offsetX = i < 6 ? 2 : (barX + barW / 2);
+      const indexInSide = i < 6 ? i : (i - 6);
+      const x = offsetX + indexInSide * triW;
+      const color = (i % 2 === 0) ? '#c0392b' : '#f5ebd6';
+      const outline = (i % 2 === 0) ? '#7a2418' : '#a08d6a';
+      // Triangle pointing down
+      svg += `<polygon points="${x},2 ${x + triW},2 ${x + triW / 2},${2 + TRI_H}" fill="${color}" stroke="${outline}" stroke-width="0.4"/>`;
+    }
+
+    // Bottom row of triangles (flipped, alternating colors offset so columns match)
+    for (let i = 0; i < 12; i++) {
+      const offsetX = i < 6 ? 2 : (barX + barW / 2);
+      const indexInSide = i < 6 ? i : (i - 6);
+      const x = offsetX + indexInSide * triW;
+      // Offset color so bottom alternation interlocks visually with top
+      const color = (i % 2 === 0) ? '#f5ebd6' : '#c0392b';
+      const outline = (i % 2 === 0) ? '#a08d6a' : '#7a2418';
+      // Triangle pointing up
+      svg += `<polygon points="${x},${H - 2} ${x + triW},${H - 2} ${x + triW / 2},${H - 2 - TRI_H}" fill="${color}" stroke="${outline}" stroke-width="0.4"/>`;
+    }
+
+    // Central bar
+    svg += `<rect x="${barX - barW / 2}" y="2" width="${barW}" height="${H - 4}" fill="#8b5a3c"/>`;
+    svg += `<rect x="${barX - barW / 2}" y="2" width="0.6" height="${H - 4}" fill="#5c3a24"/>`;
+    svg += `<rect x="${barX + barW / 2 - 0.6}" y="2" width="0.6" height="${H - 4}" fill="#5c3a24"/>`;
+
+    // ---------- Pixel dice in the middle of the board (Berk side) ----------
+    // Two dice, both on the right (Berk) half, diagonally offset for a casual look
+    function drawDie(x, y, size, value, rotation = 0) {
+      const cx = x + size / 2;
+      const cy = y + size / 2;
+      // Build pip positions for values 1-6
+      const pipMap = {
+        1: [[0.5, 0.5]],
+        2: [[0.28, 0.28], [0.72, 0.72]],
+        3: [[0.28, 0.28], [0.5, 0.5], [0.72, 0.72]],
+        4: [[0.28, 0.28], [0.72, 0.28], [0.28, 0.72], [0.72, 0.72]],
+        5: [[0.28, 0.28], [0.72, 0.28], [0.5, 0.5], [0.28, 0.72], [0.72, 0.72]],
+        6: [[0.28, 0.28], [0.72, 0.28], [0.28, 0.5], [0.72, 0.5], [0.28, 0.72], [0.72, 0.72]]
+      };
+      const pips = pipMap[value] || pipMap[1];
+      svg += `<g transform="rotate(${rotation} ${cx} ${cy})">`;
+      svg += `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="1" fill="#fffaef" stroke="#3a2818" stroke-width="0.5"/>`;
+      svg += `<rect x="${x + 0.4}" y="${y + 0.4}" width="${size - 0.8}" height="0.5" fill="rgba(255,255,255,0.7)"/>`;
+      const pipR = size * 0.09;
+      pips.forEach(([px, py]) => {
+        svg += `<circle cx="${x + px * size}" cy="${y + py * size}" r="${pipR}" fill="#3a2818"/>`;
+      });
+      svg += `</g>`;
+    }
+
+    const dieSize = 7;
+    // Both dice on right (Berk) half. Diagonal offset, slight rotation for casual feel.
+    // Right half spans from (barX + barW/2) to (W - 2)
+    const rightInnerStart = barX + barW / 2 + 2;
+    const rightInnerEnd = W - 2;
+    // Top-left-ish die in right half
+    const die1X = rightInnerStart + 3;
+    const die1Y = H / 2 - dieSize - 1;
+    // Bottom-right-ish die in right half (diagonal from die1)
+    const die2X = rightInnerEnd - dieSize - 3;
+    const die2Y = H / 2 + 1;
+
+    drawDie(die1X, die1Y, dieSize, dieValues[0], dieRotations[0]);
+    drawDie(die2X, die2Y, dieSize, dieValues[1], dieRotations[1]);
+
+    svg += `</svg>`;
+    return svg;
+  }
+
+  // ---------- Dice state ----------
+  // Initial values (static-looking — a plausible roll on game start)
+  let dieValues = [3, 5];
+  let dieRotations = [-8, 6];
+
+  document.getElementById('board').innerHTML = buildBoard();
+
+  function rebuildBoard() {
+    document.getElementById('board').innerHTML = buildBoard();
+  }
+
+  function rollDice(onComplete) {
+    // Animate ~600ms of random rolls, then settle on final values
+    const start = Date.now();
+    const duration = 600;
+    const interval = setInterval(() => {
+      dieValues = [
+        1 + Math.floor(Math.random() * 6),
+        1 + Math.floor(Math.random() * 6)
+      ];
+      dieRotations = [
+        -25 + Math.random() * 50,
+        -25 + Math.random() * 50
+      ];
+      rebuildBoard();
+      if (Date.now() - start >= duration) {
+        clearInterval(interval);
+        // Final settle: smaller, more natural rotations
+        dieValues = [
+          1 + Math.floor(Math.random() * 6),
+          1 + Math.floor(Math.random() * 6)
+        ];
+        dieRotations = [
+          -15 + Math.random() * 30,
+          -15 + Math.random() * 30
+        ];
+        rebuildBoard();
+        if (onComplete) onComplete();
+      }
+    }, 80);
+  }
+
+  // ---------- Pixel checker icon for each player ----------
+  function checkerSVG(fill, outline) {
+    return `
+      <svg class="checker" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <circle cx="8" cy="8" r="6.5" fill="${fill}" stroke="${outline}" stroke-width="1.2"/>
+        <circle cx="8" cy="8" r="4" fill="none" stroke="${outline}" stroke-width="0.5" opacity="0.5"/>
+        <circle cx="6.3" cy="6.3" r="1.6" fill="rgba(255,255,255,0.55)"/>
+      </svg>`;
+  }
+  document.getElementById('leftChecker').innerHTML = checkerSVG('#c0392b', '#7a2418');
+  document.getElementById('rightChecker').innerHTML = checkerSVG('#f5ebd6', '#a08d6a');
+
+  // ---------- Render ----------
+  const leftScoreEl = document.getElementById('leftScore');
+  const rightScoreEl = document.getElementById('rightScore');
+  const leftPipsEl = document.getElementById('leftPips');
+  const rightPipsEl = document.getElementById('rightPips');
+  const matchesEl = document.getElementById('matches');
+  const widgetEl = document.getElementById('widget');
+  const leftPanel = document.getElementById('playerLeft');
+  const rightPanel = document.getElementById('playerRight');
+
+  function buildPips(container, filled) {
+    container.innerHTML = '';
+    for (let i = 0; i < target; i++) {
+      const p = document.createElement('div');
+      p.className = 'pip' + (i < filled ? ' filled' : '');
+      container.appendChild(p);
+    }
+  }
+
+  function render() {
+    leftScoreEl.textContent = state.left;
+    rightScoreEl.textContent = state.right;
+    buildPips(leftPipsEl, state.left);
+    buildPips(rightPipsEl, state.right);
+    matchesEl.textContent = 'MATCHES: ' + state.matches;
+
+    // Highlight current leader if scores differ
+    leftPanel.classList.toggle('winner', state.left >= target);
+    rightPanel.classList.toggle('winner', state.right >= target);
+
+    // Disable + buttons if someone already won
+    const matchOver = state.left >= target || state.right >= target;
+    document.getElementById('leftPlus').disabled = matchOver;
+    document.getElementById('rightPlus').disabled = matchOver;
+  }
+
+  // ---------- Win celebration ----------
+  function celebrate(side) {
+    const banner = document.createElement('div');
+    banner.className = 'win-banner ' + (side === 'left' ? 'red' : 'cream');
+    banner.textContent = (side === 'left' ? leftName : rightName) + ' WINS!';
+    widgetEl.appendChild(banner);
+    setTimeout(() => banner.remove(), 2000);
+
+    // Sparkle burst
+    const symbols = ['✦', '✧', '⋆', '✨', '★', '⚀', '⚅'];
+    const burstColor = side === 'left' ? '#c0392b' : '#a08d6a';
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle-burst';
+      s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      s.style.color = burstColor;
+      s.style.left = '50%';
+      s.style.top = '50%';
+      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.3;
+      const dist = 90 + Math.random() * 60;
+      s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      widgetEl.appendChild(s);
+      setTimeout(() => s.remove(), 1100);
+    }
+  }
+
+  // ---------- Actions ----------
+  function addPoint(side) {
+    if (state.left >= target || state.right >= target) return;
+    state[side] = Math.min(target, state[side] + 1);
+    save();
+    render();
+    rollDice(() => {
+      if (state[side] === target) celebrate(side);
+    });
+  }
+  function subPoint(side) {
+    state[side] = Math.max(0, state[side] - 1);
+    save();
+    render();
+  }
+  function newMatch() {
+    if (state.left > 0 || state.right > 0) {
+      // Count matches that actually ended (someone hit target)
+      if (state.left >= target || state.right >= target) {
+        state.matches += 1;
+      }
+    }
+    state.left = 0;
+    state.right = 0;
+    save();
+    render();
+  }
+
+  document.getElementById('leftPlus').addEventListener('click', () => addPoint('left'));
+  document.getElementById('leftMinus').addEventListener('click', () => subPoint('left'));
+  document.getElementById('rightPlus').addEventListener('click', () => addPoint('right'));
+  document.getElementById('rightMinus').addEventListener('click', () => subPoint('right'));
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    const matchOver = state.left >= target || state.right >= target;
+    if (matchOver || confirm('Start a new match? Current scores will be reset.')) {
+      newMatch();
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
