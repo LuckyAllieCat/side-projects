@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allie & Berk's Travels ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Pixelify Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 14px;
+  }
+
+  .widget {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 16 / 9;
+    border: 4px solid #3a2818;
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 #3a2818,
+      0 10px 22px rgba(58, 40, 24, 0.18);
+    position: relative;
+    overflow: hidden;
+    background: #f5e6c8;
+  }
+
+  /* ===== SKY (cycles via opacity-stacked layers) ===== */
+  .sky {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .sky-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: skyCycle 48s linear infinite;
+  }
+  .sky-dawn   { background: linear-gradient(180deg, #ffc9b3 0%, #ffe2c7 50%, #fff0d6 100%); animation-delay:  0s; }
+  .sky-day    { background: linear-gradient(180deg, #a5d4f5 0%, #c9e7f8 60%, #e8f5fc 100%); animation-delay: 12s; }
+  .sky-sunset { background: linear-gradient(180deg, #ff9472 0%, #ffb88c 40%, #ffd9b3 80%, #f5c4a8 100%); animation-delay: 24s; }
+  .sky-night  { background: linear-gradient(180deg, #1a1b3a 0%, #3d2a5c 60%, #6b4280 100%); animation-delay: 36s; }
+  @keyframes skyCycle {
+    0%, 19%, 100% { opacity: 0; }
+    25%, 44%      { opacity: 1; }
+    50%, 75%      { opacity: 0; }
+  }
+
+  /* Sun and moon — each follows an arc, slower movement */
+  .celestial {
+    position: absolute;
+    left: -10%;
+    top: 50%;
+    width: 26px;
+    height: 26px;
+    z-index: 1;
+    opacity: 0;
+  }
+  /* Arc: left goes 0% → 100%, top traces a parabola */
+  @keyframes arcAcross {
+    0%   { left: -10%;  top: 80%; }
+    10%  { left: 5%;    top: 50%; }
+    20%  { left: 15%;   top: 28%; }
+    30%  { left: 25%;   top: 14%; }
+    40%  { left: 38%;   top: 6%;  }
+    50%  { left: 50%;   top: 4%;  }
+    60%  { left: 62%;   top: 6%;  }
+    70%  { left: 75%;   top: 14%; }
+    80%  { left: 85%;   top: 28%; }
+    90%  { left: 95%;   top: 50%; }
+    100% { left: 110%;  top: 80%; }
+  }
+
+  /* Sun: visible during dawn → day → sunset (0% → 73% of 48s cycle) */
+  .celestial.sun {
+    background: #ffd76b;
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(255, 215, 107, 0.6);
+    animation: arcSun 48s linear infinite, sunCycle 48s linear infinite;
+  }
+  @keyframes arcSun {
+    /* Sun arcs across during 0-73% (the lit portion), then stays off-screen during night */
+    0%        { left: -10%;  top: 80%; }
+    8%        { left: 5%;    top: 50%; }
+    16%       { left: 15%;   top: 28%; }
+    24%       { left: 25%;   top: 14%; }
+    32%       { left: 38%;   top: 6%;  }
+    40%       { left: 50%;   top: 4%;  }
+    48%       { left: 62%;   top: 6%;  }
+    56%       { left: 75%;   top: 14%; }
+    64%       { left: 85%;   top: 28%; }
+    70%       { left: 95%;   top: 50%; }
+    73%, 100% { left: 110%;  top: 80%; }
+  }
+  @keyframes sunCycle {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    73%  { opacity: 0; }
+    97%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* Moon: visible only at night. Arc runs full 48s but moon only travels during night window */
+  .celestial.moon {
+    animation: arcMoon 48s linear infinite, moonCycle 48s linear infinite;
+  }
+  @keyframes arcMoon {
+    /* Moon stays off-screen left until night begins (73%), then arcs across during night (73-99%) */
+    0%, 73%   { left: -10%;  top: 80%; }
+    76%       { left: 5%;    top: 50%; }
+    79%       { left: 20%;   top: 22%; }
+    82%       { left: 35%;   top: 8%;  }
+    86%       { left: 50%;   top: 4%;  }
+    90%       { left: 65%;   top: 8%;  }
+    93%       { left: 80%;   top: 22%; }
+    96%       { left: 95%;   top: 50%; }
+    99%, 100% { left: 110%;  top: 80%; }
+  }
+  @keyframes moonCycle {
+    0%   { opacity: 0; }
+    73%  { opacity: 0; }
+    76%  { opacity: 1; }
+    96%  { opacity: 1; }
+    99%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  /* Stars/sparkles visible across all backgrounds */
+  .stars {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.85;
+  }
+  .star {
+    position: absolute;
+    color: white;
+    font-size: 8px;
+    animation: twinkle 2.2s ease-in-out infinite;
+    text-shadow: 0 0 4px rgba(255,255,255,0.6);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50%      { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* ===== CITY SKYLINES ===== */
+  .scenes {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 18%;
+  }
+  .scene.active { opacity: 1; }
+  .scene svg {
+    width: 100%;
+    height: auto;
+    shape-rendering: crispEdges;
+    display: block;
+  }
+
+  /* Ground / path */
+  .ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 35%;
+    background: linear-gradient(180deg, #9caf88 0%, #7d9468 60%, #6b8458 100%);
+    z-index: 3;
+  }
+  .path {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 14%;
+    height: 18px;
+    background: linear-gradient(180deg, #d4b585 0%, #b89a6c 100%);
+    z-index: 4;
+  }
+
+  /* Animated path dashes (sense of motion) - hidden */
+  .path-dashes {
+    display: none;
+  }
+
+  /* Grass tufts on the ground */
+  .grass {
+    position: absolute;
+    bottom: 4%;
+    color: #5a7245;
+    font-size: 10px;
+    z-index: 4;
+    animation: grassScroll 1.2s linear infinite;
+  }
+  @keyframes grassScroll {
+    0%   { transform: translateX(40px); }
+    100% { transform: translateX(-40px); }
+  }
+  .grass.g1 { left: 10%; animation-delay: 0s; }
+  .grass.g2 { left: 35%; animation-delay: -0.4s; }
+  .grass.g3 { left: 60%; animation-delay: -0.8s; }
+  .grass.g4 { left: 85%; animation-delay: -0.2s; }
+  .grass.g5 { left: 22%; animation-delay: -0.6s; bottom: 7%; }
+  .grass.g6 { left: 72%; animation-delay: -1s; bottom: 7%; }
+
+  /* Flowers — small circular blossoms with colored petals */
+  .flower {
+    position: absolute;
+    z-index: 4;
+    animation: flowerScroll 3.5s linear infinite;
+  }
+  @keyframes flowerScroll {
+    0%   { transform: translateX(120%); }
+    100% { transform: translateX(-720%); }
+  }
+  .flower svg {
+    width: 12px;
+    height: 12px;
+    display: block;
+  }
+  .flower.f1 { bottom: 3%;   left: 8%;  animation-delay: 0s; animation-duration: 4s; }
+  .flower.f2 { bottom: 8%;   left: 22%; animation-delay: -1.4s; animation-duration: 3.8s; }
+  .flower.f3 { bottom: 2%;   left: 38%; animation-delay: -2.6s; animation-duration: 4.2s; }
+  .flower.f4 { bottom: 9%;   left: 55%; animation-delay: -0.7s; animation-duration: 3.6s; }
+  .flower.f5 { bottom: 4%;   left: 68%; animation-delay: -3.1s; animation-duration: 4.1s; }
+  .flower.f6 { bottom: 7%;   left: 82%; animation-delay: -1.9s; animation-duration: 3.9s; }
+  .flower.f7 { bottom: 5%;   left: 92%; animation-delay: -2.3s; animation-duration: 4s; }
+
+  /* ===== CATS ===== */
+  .cats {
+    position: absolute;
+    left: 50%;
+    bottom: 17%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    z-index: 7;
+  }
+  .cat-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: bobWalk 0.5s ease-in-out infinite;
+  }
+  .cat-wrap.berk { animation-delay: -0.25s; }
+  @keyframes bobWalk {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+  }
+
+  /* Leg-swing animation: legs alternate forward/back like real walking */
+  .cat-svg .leg {
+    transform-origin: top center;
+    animation: legSwing 0.5s ease-in-out infinite;
+  }
+  .cat-svg .leg-back-1, .cat-svg .leg-front-2 { animation-delay: 0s; }
+  .cat-svg .leg-back-2, .cat-svg .leg-front-1 { animation-delay: -0.25s; }
+  @keyframes legSwing {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-2px) translateX(1px); }
+  }
+  .cat-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    color: #3a2818;
+    background: rgba(255, 250, 239, 0.85);
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    letter-spacing: 1px;
+    border: 1px solid rgba(58, 40, 24, 0.3);
+    white-space: nowrap;
+  }
+  .cat-svg {
+    width: 68px;
+    height: 50px;
+    shape-rendering: auto;
+  }
+
+  /* "Take turns being in front" — shuffle order every 30s */
+  .cats {
+    animation: shuffleOrder 60s steps(2, end) infinite;
+  }
+  @keyframes shuffleOrder {
+    0%, 49%  { flex-direction: row; }
+    50%, 100% { flex-direction: row-reverse; }
+  }
+
+  /* Floating hearts */
+  .heart-float {
+    position: absolute;
+    color: #ff6b8a;
+    font-size: 14px;
+    z-index: 8;
+    text-shadow: 1px 1px 0 white;
+    pointer-events: none;
+    animation: heartRise 4s ease-out infinite;
+    opacity: 0;
+    bottom: 30%;
+    left: 50%;
+  }
+  @keyframes heartRise {
+    0%   { opacity: 0; transform: translate(-50%, 0) scale(0.5); }
+    15%  { opacity: 1; transform: translate(-50%, -8px) scale(1); }
+    85%  { opacity: 0.9; transform: translate(-50%, -55px) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -75px) scale(0.9); }
+  }
+  .heart-float.h2 { animation-delay: -2s; animation-duration: 4.5s; }
+
+  /* ===== CITY LABEL ===== */
+  .city-label {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #fffaef;
+    text-shadow:
+      2px 2px 0 #3a2818,
+      -1px -1px 0 #3a2818,
+      1px -1px 0 #3a2818,
+      -1px 1px 0 #3a2818;
+    z-index: 9;
+    padding: 4px 10px;
+    background: rgba(58, 40, 24, 0.35);
+    border-radius: 6px;
+    border: 2px solid #3a2818;
+    transition: opacity 0.6s ease;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .city-label.visible { opacity: 1; }
+
+  /* Sparkle deco */
+  .sparkle-deco {
+    position: absolute;
+    color: #fffaef;
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 0 0 4px rgba(0,0,0,0.3);
+  }
+  .sparkle-deco.tl { top: 6px; left: 10px; font-size: 10px; }
+  .sparkle-deco.tr { top: 6px; right: 10px; font-size: 12px; }
+  .sparkle-deco.bl { bottom: 6px; left: 10px; font-size: 8px; }
+  .sparkle-deco.br { bottom: 6px; right: 10px; font-size: 9px; }
+</style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+  <!-- Sky layers -->
+  <div class="sky">
+    <div class="sky-layer sky-dawn"></div>
+    <div class="sky-layer sky-day"></div>
+    <div class="sky-layer sky-sunset"></div>
+    <div class="sky-layer sky-night"></div>
+  </div>
+
+  <!-- Sun (visible dawn → sunset) -->
+  <div class="celestial sun"></div>
+
+  <!-- Moon (visible at night) -->
+  <div class="celestial moon">
+    <svg viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px rgba(245, 240, 216, 0.6));">
+      <!-- Crescent: full circle minus offset circle -->
+      <defs>
+        <mask id="moonMask">
+          <rect width="26" height="26" fill="white"/>
+          <circle cx="17" cy="11" r="9" fill="black"/>
+        </mask>
+      </defs>
+      <circle cx="13" cy="13" r="10" fill="#f5f0d8" mask="url(#moonMask)"/>
+    </svg>
+  </div>
+
+  <!-- Stars (only visible at night via opacity cycle) -->
+  <div class="stars" id="stars"></div>
+
+  <!-- City skylines -->
+  <div class="scenes" id="scenes"></div>
+
+  <!-- Ground / path -->
+  <div class="ground"></div>
+  <div class="path"></div>
+  <div class="path-dashes"></div>
+
+  <!-- Grass tufts -->
+  <span class="grass g1">"</span>
+  <span class="grass g2">"</span>
+  <span class="grass g3">"</span>
+  <span class="grass g4">"</span>
+  <span class="grass g5">"</span>
+  <span class="grass g6">"</span>
+
+  <!-- Flowers (filled with JS to get varied colors) -->
+  <div class="flower f1" id="flower1"></div>
+  <div class="flower f2" id="flower2"></div>
+  <div class="flower f3" id="flower3"></div>
+  <div class="flower f4" id="flower4"></div>
+  <div class="flower f5" id="flower5"></div>
+  <div class="flower f6" id="flower6"></div>
+  <div class="flower f7" id="flower7"></div>
+
+  <!-- Floating hearts -->
+  <div class="heart-float">♥</div>
+  <div class="heart-float h2">♥</div>
+
+  <!-- Cats -->
+  <div class="cats">
+    <div class="cat-wrap allie">
+      <div class="cat-name">ALLIE</div>
+      <svg class="cat-svg" id="catAllie" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="cat-wrap berk">
+      <div class="cat-name">BERK</div>
+      <svg class="cat-svg" id="catBerk" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <!-- City label -->
+  <div class="city-label" id="cityLabel">VENICE</div>
+
+  <!-- Sparkles -->
+  <span class="sparkle-deco tl">✦</span>
+  <span class="sparkle-deco tr">✧</span>
+  <span class="sparkle-deco bl">✦</span>
+  <span class="sparkle-deco br">✧</span>
+</div>
+
+<script>
+  // ---------------- CAT SILHOUETTE (side view, walking) ----------------
+  // Compact, elegant walking cat — short body, thin curved tail line
+  function buildCat(bodyColor) {
+    const ink = '#3a2818';
+    // viewBox 60x44
+    return `
+      <!-- Thin elegant tail (single curved line) -->
+      <path d="M 14 22 Q 6 18 4 10 Q 3 4 7 3 Q 10 4 10 10"
+            fill="none"
+            stroke="${ink}"
+            stroke-width="1.6"
+            stroke-linecap="round"/>
+
+      <!-- Back legs -->
+      <g class="leg leg-back-1">
+        <rect x="16" y="28" width="3.5" height="9" rx="1.7" fill="${bodyColor}" stroke="${ink}" stroke-width="1.2"/>
+      </g>
+      <g class="leg leg-back-2">
+        <rect x="22" y="28" width="3.5" height="9" rx="1.7" fill="${bodyColor}" stroke="${ink}" stroke-width="1.2"/>
+      </g>
+
+      <!-- Front legs -->
+      <g class="leg leg-front-1">
+        <rect x="36" y="28" width="3.5" height="9" rx="1.7" fill="${bodyColor}" stroke="${ink}" stroke-width="1.2"/>
+      </g>
+      <g class="leg leg-front-2">
+        <rect x="42" y="28" width="3.5" height="9" rx="1.7" fill="${bodyColor}" stroke="${ink}" stroke-width="1.2"/>
+      </g>
+
+      <!-- Body: compact rounded shape -->
+      <path d="M 13 24
+               Q 13 17, 22 17
+               L 38 17
+               Q 47 17, 47 24
+               Q 47 30, 38 30
+               L 22 30
+               Q 13 30, 13 24 Z"
+            fill="${bodyColor}"
+            stroke="${ink}"
+            stroke-width="1.5"
+            stroke-linejoin="round"/>
+
+      <!-- Head: rounded with subtle nose -->
+      <path d="M 43 14
+               Q 52 12, 54 16
+               Q 55 20, 53 22
+               Q 50 24, 46 23
+               Q 43 22, 43 14 Z"
+            fill="${bodyColor}"
+            stroke="${ink}"
+            stroke-width="1.4"
+            stroke-linejoin="round"/>
+
+      <!-- Ears: two small pointy triangles -->
+      <path d="M 44 14 L 43 9 L 46 12 Z"
+            fill="${bodyColor}"
+            stroke="${ink}"
+            stroke-width="1.2"
+            stroke-linejoin="round"/>
+      <path d="M 49 12 L 50 8 L 52 13 Z"
+            fill="${bodyColor}"
+            stroke="${ink}"
+            stroke-width="1.2"
+            stroke-linejoin="round"/>
+    `;
+  }
+  document.getElementById('catAllie').innerHTML = buildCat('#ff8fab');
+  document.getElementById('catBerk').innerHTML  = buildCat('#f5ebd6');
+
+  // ---------------- FLOWERS ----------------
+  // Cute little flowers with varied colors, scattered along the ground
+  function buildFlower(petalColor, centerColor) {
+    return `
+      <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+        <!-- Stem -->
+        <rect x="5.5" y="6" width="1" height="6" fill="#5a7245"/>
+        <!-- Tiny leaf -->
+        <ellipse cx="4" cy="9" rx="1.5" ry="0.8" fill="#5a7245" transform="rotate(-20 4 9)"/>
+        <!-- Petals -->
+        <circle cx="6" cy="3" r="1.8" fill="${petalColor}" stroke="rgba(0,0,0,0.15)" stroke-width="0.3"/>
+        <circle cx="3.5" cy="5" r="1.8" fill="${petalColor}" stroke="rgba(0,0,0,0.15)" stroke-width="0.3"/>
+        <circle cx="8.5" cy="5" r="1.8" fill="${petalColor}" stroke="rgba(0,0,0,0.15)" stroke-width="0.3"/>
+        <circle cx="6" cy="6.5" r="1.8" fill="${petalColor}" stroke="rgba(0,0,0,0.15)" stroke-width="0.3"/>
+        <!-- Center -->
+        <circle cx="6" cy="4.7" r="1.2" fill="${centerColor}"/>
+      </svg>
+    `;
+  }
+
+  const flowerColors = [
+    { petal: '#ff8fab', center: '#ffd76b' }, // pink
+    { petal: '#fff4b3', center: '#ff8fab' }, // yellow
+    { petal: '#c4a4ff', center: '#fff4b3' }, // purple
+    { petal: '#ffffff', center: '#ffd76b' }, // white daisy
+    { petal: '#ffb3d9', center: '#fff4b3' }, // light pink
+    { petal: '#a78bfa', center: '#ffffff' }, // lavender
+    { petal: '#ff9472', center: '#fff4b3' }, // coral
+  ];
+
+  for (let i = 1; i <= 7; i++) {
+    const c = flowerColors[(i - 1) % flowerColors.length];
+    document.getElementById('flower' + i).innerHTML = buildFlower(c.petal, c.center);
+  }
+
+  // ---------------- STARS ----------------
+  const starsEl = document.getElementById('stars');
+  const starGlyphs = ['✦', '✧', '⋆', '·'];
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.textContent = starGlyphs[Math.floor(Math.random() * starGlyphs.length)];
+    s.style.left = (5 + Math.random() * 90) + '%';
+    s.style.top = (5 + Math.random() * 35) + '%';
+    s.style.animationDelay = (Math.random() * 2.2) + 's';
+    s.style.fontSize = (6 + Math.random() * 6) + 'px';
+    starsEl.appendChild(s);
+  }
+
+  // ---------------- CITY SKYLINES ----------------
+  // Each city is a pixel-art SVG silhouette
+  // Returns the inner contents of an SVG (viewBox 200x60), drawing the skyline
+  // We use simple rect-based silhouettes in a deeper warm color so they read against any sky
+  const cityColor = '#5a4838';
+  const cityHighlight = '#7d6a55';
+
+  // VENICE: campanile + dome + canal palaces + a gondola hint
+  function venice() {
+    let s = '';
+    // Background fog/distant hills
+    s += `<rect x="0" y="50" width="200" height="10" fill="${cityHighlight}" opacity="0.4"/>`;
+    // Distant building blocks (left)
+    s += `<rect x="2" y="40" width="6" height="20" fill="${cityColor}"/>`;
+    s += `<rect x="3" y="44" width="1" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="6" y="44" width="1" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="3" y="50" width="1" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="6" y="50" width="1" height="2" fill="${cityHighlight}"/>`;
+
+    // Larger building with arched windows
+    s += `<rect x="10" y="34" width="20" height="26" fill="${cityColor}"/>`;
+    s += `<polygon points="10,34 30,34 20,28" fill="${cityColor}"/>`;
+    // Arched windows top
+    for (let i = 0; i < 3; i++) {
+      const ax = 13 + i * 6;
+      s += `<rect x="${ax}" y="40" width="3" height="5" fill="${cityHighlight}"/>`;
+      s += `<circle cx="${ax + 1.5}" cy="40" r="1.5" fill="${cityHighlight}"/>`;
+      s += `<rect x="${ax}" y="50" width="3" height="5" fill="${cityHighlight}"/>`;
+      s += `<circle cx="${ax + 1.5}" cy="50" r="1.5" fill="${cityHighlight}"/>`;
+    }
+    // Flag on top
+    s += `<rect x="19.5" y="22" width="1" height="6" fill="${cityColor}"/>`;
+    s += `<polygon points="20,22 24,24 20,26" fill="#c0392b"/>`;
+
+    // Palazzo with arched window row
+    s += `<rect x="32" y="36" width="34" height="24" fill="${cityColor}"/>`;
+    // Decorative roofline
+    for (let i = 0; i < 8; i++) {
+      s += `<rect x="${33 + i*4}" y="34" width="2" height="2" fill="${cityColor}"/>`;
+    }
+    for (let i = 0; i < 4; i++) {
+      s += `<rect x="${36 + i*7}" y="40" width="3" height="5" fill="${cityHighlight}"/>`;
+      s += `<circle cx="${37.5 + i*7}" cy="40" r="1.5" fill="${cityHighlight}"/>`;
+      s += `<rect x="${36 + i*7}" y="50" width="3" height="5" fill="${cityHighlight}"/>`;
+    }
+    // Door in center
+    s += `<rect x="47" y="54" width="4" height="6" fill="${cityHighlight}"/>`;
+    s += `<circle cx="49" cy="54" r="2" fill="${cityHighlight}"/>`;
+
+    // St. Mark's basilica with multiple domes
+    s += `<rect x="72" y="30" width="48" height="30" fill="${cityColor}"/>`;
+    // Three domes
+    s += `<circle cx="84" cy="28" r="6" fill="${cityColor}"/>`;
+    s += `<circle cx="96" cy="26" r="7" fill="${cityColor}"/>`;
+    s += `<circle cx="108" cy="28" r="6" fill="${cityColor}"/>`;
+    // Cross on big dome
+    s += `<rect x="95" y="16" width="2" height="6" fill="${cityColor}"/>`;
+    s += `<rect x="93" y="18" width="6" height="2" fill="${cityColor}"/>`;
+    // Cross on side domes
+    s += `<rect x="83.5" y="20" width="1" height="3" fill="${cityColor}"/>`;
+    s += `<rect x="107.5" y="20" width="1" height="3" fill="${cityColor}"/>`;
+    // Arched entrance
+    s += `<rect x="93" y="44" width="6" height="16" fill="${cityHighlight}"/>`;
+    s += `<circle cx="96" cy="44" r="3" fill="${cityHighlight}"/>`;
+    // Side windows
+    s += `<rect x="76" y="40" width="3" height="5" fill="${cityHighlight}"/>`;
+    s += `<rect x="76" y="50" width="3" height="5" fill="${cityHighlight}"/>`;
+    s += `<rect x="114" y="40" width="3" height="5" fill="${cityHighlight}"/>`;
+    s += `<rect x="114" y="50" width="3" height="5" fill="${cityHighlight}"/>`;
+
+    // Campanile (bell tower) — tall thin
+    s += `<rect x="125" y="14" width="9" height="46" fill="${cityColor}"/>`;
+    s += `<polygon points="125,14 134,14 129.5,7" fill="${cityColor}"/>`;
+    // Tower top detail (bell windows)
+    s += `<rect x="127" y="18" width="2" height="4" fill="${cityHighlight}"/>`;
+    s += `<rect x="130" y="18" width="2" height="4" fill="${cityHighlight}"/>`;
+    // Decorative bands
+    s += `<rect x="125" y="28" width="9" height="1" fill="${cityHighlight}"/>`;
+    s += `<rect x="125" y="38" width="9" height="1" fill="${cityHighlight}"/>`;
+    s += `<rect x="125" y="48" width="9" height="1" fill="${cityHighlight}"/>`;
+
+    // Right side palazzos with detail
+    s += `<rect x="140" y="40" width="20" height="20" fill="${cityColor}"/>`;
+    s += `<polygon points="140,40 160,40 150,35" fill="${cityColor}"/>`;
+    for (let i = 0; i < 3; i++) {
+      s += `<rect x="${143 + i*7}" y="44" width="3" height="4" fill="${cityHighlight}"/>`;
+      s += `<rect x="${143 + i*7}" y="52" width="3" height="4" fill="${cityHighlight}"/>`;
+    }
+    // Far right
+    s += `<rect x="165" y="42" width="18" height="18" fill="${cityColor}"/>`;
+    s += `<rect x="168" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="173" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="178" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="173" y="54" width="3" height="6" fill="${cityHighlight}"/>`;
+
+    // Smaller far-right building
+    s += `<rect x="186" y="48" width="12" height="12" fill="${cityColor}"/>`;
+    s += `<rect x="189" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="193" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+
+    // Water hint
+    s += `<rect x="0" y="58" width="200" height="2" fill="rgba(100,140,170,0.3)"/>`;
+
+    // Tiny gondola silhouette
+    s += `<path d="M 50 56 Q 55 54 60 56 L 58 58 L 52 58 Z" fill="${cityColor}"/>`;
+    s += `<rect x="54" y="51" width="1" height="5" fill="${cityColor}"/>`;
+    // Another smaller boat
+    s += `<path d="M 162 57 Q 166 56 170 57 L 168.5 58.5 L 163.5 58.5 Z" fill="${cityColor}"/>`;
+
+    return s;
+  }
+
+  // BOLOGNA: the two leaning towers (Asinelli + Garisenda) + colonnaded buildings
+  function bologna() {
+    let s = '';
+    // Distant fog
+    s += `<rect x="0" y="50" width="200" height="10" fill="${cityHighlight}" opacity="0.4"/>`;
+    // Left building cluster
+    s += `<rect x="6" y="42" width="30" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="6,42 36,42 21,37" fill="${cityColor}"/>`;
+    for (let i = 0; i < 5; i++) {
+      s += `<rect x="${9 + i*5}" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+      s += `<rect x="${9 + i*5}" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    }
+    // Door
+    s += `<rect x="20" y="55" width="3" height="5" fill="${cityHighlight}"/>`;
+
+    // Garisenda — short, leaning
+    s += `<g transform="rotate(-4 60 50)">`;
+    s += `<rect x="56" y="22" width="10" height="38" fill="${cityColor}"/>`;
+    s += `<rect x="58" y="28" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="62" y="34" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="58" y="42" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="62" y="50" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<polygon points="56,22 66,22 61,16" fill="${cityColor}"/>`;
+    // Crenellations
+    for (let i = 0; i < 4; i++) {
+      s += `<rect x="${56 + i*3}" y="20" width="1.5" height="3" fill="${cityColor}"/>`;
+    }
+    s += `</g>`;
+
+    // Asinelli — tall, slight lean
+    s += `<g transform="rotate(2 88 50)">`;
+    s += `<rect x="84" y="6" width="10" height="54" fill="${cityColor}"/>`;
+    s += `<rect x="86" y="14" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="90" y="22" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="86" y="32" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="90" y="44" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="86" y="50" width="2" height="2" fill="${cityHighlight}"/>`;
+    s += `<polygon points="84,6 94,6 89,0" fill="${cityColor}"/>`;
+    // Flag on top
+    s += `<rect x="88.5" y="-4" width="1" height="6" fill="${cityColor}"/>`;
+    s += `<polygon points="89,-4 93,-2 89,0" fill="#c0392b"/>`;
+    s += `</g>`;
+
+    // Right side colonnade (the famous porticos)
+    s += `<rect x="105" y="40" width="60" height="20" fill="${cityColor}"/>`;
+    // Decorative roofline
+    for (let i = 0; i < 10; i++) {
+      s += `<rect x="${106 + i*6}" y="38" width="2" height="2" fill="${cityColor}"/>`;
+    }
+    // Upper windows
+    for (let i = 0; i < 6; i++) {
+      s += `<rect x="${109 + i*9}" y="42" width="2" height="4" fill="${cityHighlight}"/>`;
+    }
+    // Arches at bottom
+    for (let i = 0; i < 6; i++) {
+      const ax = 108 + i * 9;
+      s += `<rect x="${ax}" y="52" width="6" height="8" fill="#f5e6c8"/>`;
+      s += `<circle cx="${ax + 3}" cy="52" r="3" fill="#f5e6c8"/>`;
+    }
+    // Far right building with chimney
+    s += `<rect x="170" y="44" width="16" height="16" fill="${cityColor}"/>`;
+    s += `<polygon points="170,44 186,44 178,40" fill="${cityColor}"/>`;
+    s += `<rect x="183" y="36" width="2" height="6" fill="${cityColor}"/>`;
+    s += `<rect x="173" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="178" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="183" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Tree
+    s += `<rect x="188" y="52" width="1.5" height="8" fill="#5a4838"/>`;
+    s += `<circle cx="188.7" cy="50" r="3.5" fill="#5a7245"/>`;
+    return s;
+  }
+
+  // VERONA: arena (coliseum-style) + cathedral + bridge
+  function verona() {
+    let s = '';
+    s += `<rect x="0" y="50" width="200" height="10" fill="${cityHighlight}" opacity="0.4"/>`;
+    // Tree on far left
+    s += `<rect x="2" y="50" width="1.5" height="10" fill="#5a4838"/>`;
+    s += `<circle cx="2.7" cy="48" r="3" fill="#5a7245"/>`;
+    // Left buildings
+    s += `<rect x="6" y="42" width="20" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="6,42 26,42 16,37" fill="${cityColor}"/>`;
+    for (let row = 0; row < 2; row++) {
+      const wy = 46 + row * 7;
+      s += `<rect x="9" y="${wy}" width="2" height="3" fill="${cityHighlight}"/>`;
+      s += `<rect x="14" y="${wy}" width="2" height="3" fill="${cityHighlight}"/>`;
+      s += `<rect x="19" y="${wy}" width="2" height="3" fill="${cityHighlight}"/>`;
+    }
+    // Door
+    s += `<rect x="14" y="55" width="3" height="5" fill="${cityHighlight}"/>`;
+
+    // Arena (Roman amphitheater)
+    s += `<rect x="32" y="30" width="80" height="30" fill="${cityColor}"/>`;
+    // Top curved rim
+    s += `<ellipse cx="72" cy="30" rx="40" ry="6" fill="${cityColor}"/>`;
+    // Top crenellations
+    for (let i = 0; i < 14; i++) {
+      s += `<rect x="${36 + i*5.5}" y="26" width="2" height="3" fill="${cityColor}"/>`;
+    }
+    // Arched openings (two rows)
+    for (let i = 0; i < 7; i++) {
+      const ax = 37 + i * 10;
+      s += `<rect x="${ax}" y="38" width="5" height="7" fill="#f5e6c8"/>`;
+      s += `<circle cx="${ax + 2.5}" cy="38" r="2.5" fill="#f5e6c8"/>`;
+      s += `<rect x="${ax}" y="50" width="5" height="7" fill="#f5e6c8"/>`;
+      s += `<circle cx="${ax + 2.5}" cy="50" r="2.5" fill="#f5e6c8"/>`;
+    }
+
+    // Right side — cathedral with tower
+    s += `<rect x="120" y="34" width="34" height="26" fill="${cityColor}"/>`;
+    s += `<polygon points="120,34 154,34 137,20" fill="${cityColor}"/>`;
+    // Cross on cathedral
+    s += `<rect x="136.5" y="14" width="1" height="6" fill="${cityColor}"/>`;
+    s += `<rect x="134" y="16" width="6" height="1" fill="${cityColor}"/>`;
+    // Round window (rose window)
+    s += `<circle cx="137" cy="40" r="3" fill="${cityHighlight}"/>`;
+    s += `<circle cx="137" cy="40" r="1.5" fill="${cityColor}"/>`;
+    // Side windows
+    s += `<rect x="124" y="46" width="3" height="6" fill="${cityHighlight}"/>`;
+    s += `<rect x="147" y="46" width="3" height="6" fill="${cityHighlight}"/>`;
+    // Door
+    s += `<rect x="135" y="52" width="4" height="8" fill="${cityHighlight}"/>`;
+    s += `<circle cx="137" cy="52" r="2" fill="${cityHighlight}"/>`;
+
+    // Cathedral tower
+    s += `<rect x="158" y="20" width="10" height="40" fill="${cityColor}"/>`;
+    s += `<polygon points="158,20 168,20 163,12" fill="${cityColor}"/>`;
+    s += `<rect x="160" y="26" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="164" y="32" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="160" y="40" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="164" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Bell
+    s += `<rect x="161" y="22" width="6" height="3" fill="${cityHighlight}"/>`;
+
+    // Far right building + tree
+    s += `<rect x="174" y="44" width="14" height="16" fill="${cityColor}"/>`;
+    s += `<polygon points="174,44 188,44 181,40" fill="${cityColor}"/>`;
+    s += `<rect x="177" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="182" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="190" y="52" width="1.5" height="8" fill="#5a4838"/>`;
+    s += `<circle cx="190.7" cy="50" r="3" fill="#5a7245"/>`;
+    return s;
+  }
+
+  // PADOVA: Basilica of Sant'Antonio (multi-dome silhouette) + Prato della Valle hint
+  function padova() {
+    let s = '';
+    s += `<rect x="0" y="50" width="200" height="10" fill="${cityHighlight}" opacity="0.4"/>`;
+    // Left buildings
+    s += `<rect x="6" y="42" width="22" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="6,42 28,42 17,37" fill="${cityColor}"/>`;
+    for (let i = 0; i < 3; i++) {
+      s += `<rect x="${9 + i*6}" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+      s += `<rect x="${9 + i*6}" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    }
+    // Tree
+    s += `<rect x="2" y="50" width="1.5" height="10" fill="#5a4838"/>`;
+    s += `<circle cx="2.7" cy="48" r="3" fill="#5a7245"/>`;
+
+    // Sant'Antonio Basilica — wide base + multiple domes
+    s += `<rect x="34" y="36" width="80" height="24" fill="${cityColor}"/>`;
+    // Roofline decoration
+    for (let i = 0; i < 8; i++) {
+      s += `<rect x="${36 + i*10}" y="34" width="3" height="2" fill="${cityColor}"/>`;
+    }
+    // Two flanking minaret-style towers
+    s += `<rect x="38" y="22" width="6" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="38,22 44,22 41,17" fill="${cityColor}"/>`;
+    s += `<rect x="39" y="26" width="1.5" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="41.5" y="26" width="1.5" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="104" y="22" width="6" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="104,22 110,22 107,17" fill="${cityColor}"/>`;
+    s += `<rect x="105" y="26" width="1.5" height="2" fill="${cityHighlight}"/>`;
+    s += `<rect x="107.5" y="26" width="1.5" height="2" fill="${cityHighlight}"/>`;
+    // Central main dome
+    s += `<circle cx="74" cy="32" r="11" fill="${cityColor}"/>`;
+    s += `<rect x="73" y="14" width="2" height="8" fill="${cityColor}"/>`;
+    // Cross
+    s += `<rect x="73" y="14" width="2" height="2" fill="${cityHighlight}"/>`;
+    // Smaller flanking domes
+    s += `<circle cx="58" cy="34" r="6" fill="${cityColor}"/>`;
+    s += `<circle cx="90" cy="34" r="6" fill="${cityColor}"/>`;
+    // Window row
+    for (let i = 0; i < 6; i++) {
+      s += `<rect x="${42 + i*11}" y="46" width="3" height="5" fill="${cityHighlight}"/>`;
+      s += `<circle cx="${43.5 + i*11}" cy="46" r="1.5" fill="${cityHighlight}"/>`;
+    }
+    // Doorway
+    s += `<rect x="72" y="54" width="4" height="6" fill="${cityHighlight}"/>`;
+    s += `<circle cx="74" cy="54" r="2" fill="${cityHighlight}"/>`;
+
+    // Right side — Prato della Valle suggestion (statue silhouettes)
+    s += `<rect x="124" y="44" width="60" height="16" fill="${cityColor}"/>`;
+    s += `<polygon points="124,44 184,44 154,40" fill="${cityColor}"/>`;
+    // Windows
+    for (let i = 0; i < 5; i++) {
+      s += `<rect x="${128 + i*12}" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    }
+    // Statue silhouettes on top
+    for (let i = 0; i < 5; i++) {
+      const sx = 130 + i * 11;
+      s += `<rect x="${sx}" y="38" width="2" height="6" fill="${cityColor}"/>`;
+      s += `<circle cx="${sx + 1}" cy="37" r="1.5" fill="${cityColor}"/>`;
+    }
+    // Tree
+    s += `<rect x="190" y="52" width="1.5" height="8" fill="#5a4838"/>`;
+    s += `<circle cx="190.7" cy="50" r="3" fill="#5a7245"/>`;
+    return s;
+  }
+
+  // FABRIANO: small medieval hill town — castle + clustered tile-roofed houses
+  function fabriano() {
+    let s = '';
+    // Rolling hills behind
+    s += `<ellipse cx="40" cy="68" rx="50" ry="14" fill="${cityHighlight}"/>`;
+    s += `<ellipse cx="140" cy="70" rx="55" ry="14" fill="${cityHighlight}"/>`;
+    // Smaller hill
+    s += `<ellipse cx="100" cy="64" rx="22" ry="6" fill="${cityHighlight}" opacity="0.7"/>`;
+
+    // Cluster of medieval houses (left)
+    s += `<rect x="20" y="44" width="14" height="16" fill="${cityColor}"/>`;
+    s += `<polygon points="20,44 34,44 27,38" fill="${cityColor}"/>`;
+    s += `<rect x="36" y="40" width="16" height="20" fill="${cityColor}"/>`;
+    s += `<polygon points="36,40 52,40 44,34" fill="${cityColor}"/>`;
+    s += `<rect x="54" y="46" width="12" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="54,46 66,46 60,40" fill="${cityColor}"/>`;
+    // Windows
+    s += `<rect x="24" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="29" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="40" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="46" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="40" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="46" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="58" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Door
+    s += `<rect x="42" y="55" width="3" height="5" fill="${cityHighlight}"/>`;
+    s += `<rect x="58" y="55" width="3" height="5" fill="${cityHighlight}"/>`;
+    // Chimney
+    s += `<rect x="48" y="32" width="2" height="5" fill="${cityColor}"/>`;
+
+    // Castle / palazzo with crenellations in the middle
+    s += `<rect x="78" y="28" width="34" height="32" fill="${cityColor}"/>`;
+    // Crenellations on top
+    for (let i = 0; i < 9; i++) {
+      s += `<rect x="${78 + i*4}" y="24" width="2" height="4" fill="${cityColor}"/>`;
+    }
+    // Arrow slit windows
+    s += `<rect x="83" y="34" width="1.5" height="4" fill="${cityHighlight}"/>`;
+    s += `<rect x="90" y="34" width="1.5" height="4" fill="${cityHighlight}"/>`;
+    s += `<rect x="100" y="34" width="1.5" height="4" fill="${cityHighlight}"/>`;
+    s += `<rect x="107" y="34" width="1.5" height="4" fill="${cityHighlight}"/>`;
+    // Door
+    s += `<rect x="93" y="52" width="4" height="8" fill="${cityHighlight}"/>`;
+    s += `<circle cx="95" cy="52" r="2" fill="${cityHighlight}"/>`;
+    // Central tall tower
+    s += `<rect x="92" y="14" width="8" height="46" fill="${cityColor}"/>`;
+    // Crenellations on tower
+    for (let i = 0; i < 4; i++) {
+      s += `<rect x="${92 + i*2}" y="12" width="1" height="2" fill="${cityColor}"/>`;
+    }
+    // Tower windows
+    s += `<rect x="95" y="20" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="95" y="30" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="95" y="40" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Flag
+    s += `<rect x="95.5" y="6" width="1" height="6" fill="${cityColor}"/>`;
+    s += `<polygon points="96,6 100,8 96,10" fill="#c0392b"/>`;
+
+    // Right cluster
+    s += `<rect x="118" y="42" width="14" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="118,42 132,42 125,36" fill="${cityColor}"/>`;
+    s += `<rect x="134" y="46" width="12" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="134,46 146,46 140,40" fill="${cityColor}"/>`;
+    s += `<rect x="148" y="42" width="16" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="148,42 164,42 156,36" fill="${cityColor}"/>`;
+    s += `<rect x="168" y="46" width="14" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="168,46 182,46 175,40" fill="${cityColor}"/>`;
+    // Windows on right cluster
+    s += `<rect x="122" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="127" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="122" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="138" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="152" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="158" y="46" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="152" y="52" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="172" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="177" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Tree
+    s += `<rect x="186" y="52" width="1.5" height="8" fill="#5a4838"/>`;
+    s += `<circle cx="186.7" cy="50" r="3.5" fill="#5a7245"/>`;
+    return s;
+  }
+
+  // VICENZA: Palladian architecture — Basilica Palladiana + columned villa silhouettes
+  function vicenza() {
+    let s = '';
+    s += `<rect x="0" y="50" width="200" height="10" fill="${cityHighlight}" opacity="0.4"/>`;
+    // Tree left
+    s += `<rect x="2" y="50" width="1.5" height="10" fill="#5a4838"/>`;
+    s += `<circle cx="2.7" cy="48" r="3" fill="#5a7245"/>`;
+    // Left building
+    s += `<rect x="6" y="44" width="22" height="16" fill="${cityColor}"/>`;
+    s += `<polygon points="6,44 28,44 17,39" fill="${cityColor}"/>`;
+    for (let i = 0; i < 3; i++) {
+      s += `<rect x="${9 + i*6}" y="48" width="2" height="3" fill="${cityHighlight}"/>`;
+      s += `<rect x="${9 + i*6}" y="54" width="2" height="3" fill="${cityHighlight}"/>`;
+    }
+
+    // Basilica Palladiana — wide rectangular with green copper roof + clock tower
+    s += `<rect x="32" y="34" width="70" height="26" fill="${cityColor}"/>`;
+    // Loggia arches at the bottom
+    for (let i = 0; i < 6; i++) {
+      const ax = 36 + i * 11;
+      s += `<rect x="${ax}" y="48" width="6" height="12" fill="#f5e6c8"/>`;
+      s += `<circle cx="${ax + 3}" cy="48" r="3" fill="#f5e6c8"/>`;
+    }
+    // Roof line — distinctive curved roof
+    s += `<ellipse cx="67" cy="34" rx="36" ry="6" fill="${cityColor}"/>`;
+    s += `<ellipse cx="67" cy="34" rx="36" ry="6" fill="#7a9c7a" opacity="0.5"/>`;
+    // Statues on top
+    for (let i = 0; i < 4; i++) {
+      const sx = 40 + i * 18;
+      s += `<rect x="${sx}" y="26" width="2" height="6" fill="${cityColor}"/>`;
+      s += `<circle cx="${sx + 1}" cy="25" r="1.5" fill="${cityColor}"/>`;
+    }
+
+    // Clock tower (Torre Bissara)
+    s += `<rect x="106" y="14" width="9" height="46" fill="${cityColor}"/>`;
+    s += `<polygon points="106,14 115,14 110.5,8" fill="${cityColor}"/>`;
+    // Clock face
+    s += `<circle cx="110.5" cy="22" r="2.5" fill="${cityHighlight}"/>`;
+    s += `<rect x="110" y="22" width="1" height="2.5" fill="${cityColor}"/>`;
+    s += `<rect x="110.5" y="22" width="2" height="1" fill="${cityColor}"/>`;
+    // Decorative bands
+    s += `<rect x="106" y="32" width="9" height="1" fill="${cityHighlight}"/>`;
+    s += `<rect x="106" y="44" width="9" height="1" fill="${cityHighlight}"/>`;
+    // Lower window
+    s += `<rect x="108" y="38" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="111" y="38" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="108" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="111" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Flag
+    s += `<rect x="110" y="2" width="1" height="6" fill="${cityColor}"/>`;
+    s += `<polygon points="110.5,2 114,4 110.5,6" fill="#c0392b"/>`;
+
+    // Right side — Palladian villa with columns + pediment
+    s += `<rect x="124" y="42" width="42" height="18" fill="${cityColor}"/>`;
+    s += `<polygon points="124,42 166,42 145,32" fill="${cityColor}"/>`;
+    // Columns
+    for (let i = 0; i < 4; i++) {
+      s += `<rect x="${130 + i*9}" y="44" width="2" height="14" fill="${cityHighlight}"/>`;
+    }
+    // Door between columns
+    s += `<rect x="143" y="50" width="4" height="10" fill="${cityHighlight}"/>`;
+    s += `<rect x="143" y="50" width="4" height="1" fill="${cityColor}"/>`;
+    // Pediment decoration
+    s += `<circle cx="145" cy="38" r="1.5" fill="${cityHighlight}"/>`;
+
+    // Far right building
+    s += `<rect x="172" y="46" width="16" height="14" fill="${cityColor}"/>`;
+    s += `<polygon points="172,46 188,46 180,42" fill="${cityColor}"/>`;
+    s += `<rect x="175" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="180" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    s += `<rect x="184" y="50" width="2" height="3" fill="${cityHighlight}"/>`;
+    // Tree
+    s += `<rect x="192" y="52" width="1.5" height="8" fill="#5a4838"/>`;
+    s += `<circle cx="192.7" cy="50" r="3" fill="#5a7245"/>`;
+    return s;
+  }
+
+  const cities = [
+    { name: 'VENICE',    draw: venice },
+    { name: 'PADOVA',    draw: padova },
+    { name: 'VICENZA',   draw: vicenza },
+    { name: 'VERONA',    draw: verona },
+    { name: 'BOLOGNA',   draw: bologna },
+    { name: 'FABRIANO',  draw: fabriano },
+  ];
+
+  // Build all city SVGs upfront, layered for cross-fade
+  const scenesEl = document.getElementById('scenes');
+  cities.forEach((city, i) => {
+    const div = document.createElement('div');
+    div.className = 'scene';
+    div.dataset.idx = i;
+    div.innerHTML = `<svg viewBox="0 0 200 60" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">${city.draw()}</svg>`;
+    scenesEl.appendChild(div);
+  });
+
+  // ---------------- CITY CYCLE ----------------
+  const cityLabelEl = document.getElementById('cityLabel');
+  const sceneEls = document.querySelectorAll('.scene');
+  let currentCity = 0;
+
+  function showCity(idx) {
+    sceneEls.forEach(s => s.classList.remove('active'));
+    sceneEls[idx].classList.add('active');
+    cityLabelEl.textContent = cities[idx].name;
+    cityLabelEl.classList.remove('visible');
+    // Force reflow + then fade in label after a beat (matches scene crossfade)
+    void cityLabelEl.offsetWidth;
+    setTimeout(() => cityLabelEl.classList.add('visible'), 400);
+    // Hide label before transition out so it can fade back in cleanly
+    setTimeout(() => cityLabelEl.classList.remove('visible'), 7000);
+  }
+
+  // Start: show first city
+  showCity(0);
+
+  // Cycle every 8 seconds
+  setInterval(() => {
+    currentCity = (currentCity + 1) % cities.length;
+    showCity(currentCity);
+  }, 8000);
+</script>
+</body>
+</html>
