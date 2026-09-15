@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>moon prism radio</title>
+  <style>
+    @font-face {
+      font-family: Moon;
+      src: url("./moonprism.ttf") format("truetype");
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      padding: 5px;
+      color: #205b83;
+      font-family: Moon, "Courier New", monospace;
+      user-select: none;
+    }
+
+    button { font-family: inherit; }
+
+    .card {
+      position: relative;
+      height: 174px;
+      overflow: hidden;
+      border: 2px solid #61bada;
+      border-radius: 21px;
+      background:
+        linear-gradient(180deg, transparent 72%, rgba(226, 208, 250, .55)),
+        url('water-bg.jpg') center / cover;
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, .88),
+        0 2px 5px rgba(55, 126, 167, .47);
+    }
+
+    /* frosted inner panel so text stays readable over the water */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 33px 5px 5px;
+      border: 1.5px solid rgba(255, 255, 255, .85);
+      border-radius: 15px;
+      background: rgba(235, 250, 253, .38);
+      pointer-events: none;
+    }
+
+    .header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 31px;
+      padding: 2px 10px 0;
+      gap: 7px;
+      -webkit-app-region: drag;
+    }
+
+    .twinkle,
+    .spark {
+      color: white;
+      text-shadow: 0 0 5px #58b8d2;
+      pointer-events: none;
+    }
+
+    .twinkle { font-size: 18px; }
+
+    .wordmark {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+    }
+
+    .window-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .window-buttons button {
+      width: 23px;
+      height: 21px;
+      padding: 0;
+      border: 2px solid #28779e;
+      border-radius: 4px;
+      background: #d8f5fb;
+      box-shadow: inset 1px 1px #fff, 1px 1px #6fbad0;
+      color: #245f84;
+      cursor: pointer;
+      font: bold 16px/15px Arial;
+      -webkit-app-region: no-drag;
+    }
+
+    .main {
+      position: relative;
+      display: grid;
+      grid-template-columns: 198px 1fr 39px;
+      height: 134px;
+      margin: 0 9px;
+      gap: 10px;
+    }
+
+    .scene {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #fff;
+      border-radius: 9px;
+      background: #8bdded;
+      box-shadow: 0 0 0 1px #62aac6;
+    }
+
+    .scene img,
+    .scene video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scene #sceneGif {
+      image-rendering: pixelated;
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+
+    .scene.has-gif #sceneGif { display: block; }
+
+    .info {
+      min-width: 0;
+      padding: 6px 0;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .track-title {
+      flex: 1;
+      overflow: hidden;
+      color: #164e76;
+      font-size: 15px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .heart,
+    .transport button,
+    .rail button {
+      border: 0;
+      background: transparent;
+      color: #2d729d;
+      cursor: pointer;
+    }
+
+    .heart {
+      font-size: 26px;
+      line-height: 24px;
+    }
+
+    .artist {
+      height: 24px;
+      overflow: hidden;
+      font-size: 12px;
+      letter-spacing: 1.25px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .progress {
+      display: grid;
+      grid-template-columns: 28px 1fr 30px;
+      align-items: center;
+      height: 27px;
+      gap: 5px;
+      font-size: 11px;
+      letter-spacing: .55px;
+    }
+
+    .bar {
+      position: relative;
+      height: 8px;
+      border: 1px solid #55adcd;
+      border-radius: 6px;
+      background: #a9e5ef;
+      box-shadow: inset 0 1px rgba(255, 255, 255, .8);
+      cursor: pointer;
+    }
+
+    .fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #82d2e4;
+    }
+
+    .knob {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 28px;
+      height: 28px;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .8));
+      pointer-events: none;
+    }
+
+    .transport {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2px;
+    }
+
+    .transport button {
+      display: grid;
+      width: 34px;
+      height: 36px;
+      padding: 4px;
+      place-items: center;
+    }
+
+    .transport svg {
+      width: 27px;
+      height: 27px;
+      overflow: visible;
+    }
+
+    .transport .primary {
+      width: 43px;
+      height: 43px;
+      padding: 10px;
+      border-radius: 50%;
+      background: #63acd0;
+      box-shadow: inset 0 1px #a9e9f5;
+      color: white;
+    }
+
+    .transport .primary svg {
+      width: 23px;
+      height: 23px;
+    }
+
+    .transport .pause-icon { display: none; }
+    .transport .is-playing .play-icon { display: none; }
+    .transport .is-playing .pause-icon { display: block; }
+    .transport button.active { color: #d99e38; }
+
+    .rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 5px 0;
+    }
+
+    .rail button {
+      display: grid;
+      width: 33px;
+      height: 36px;
+      padding: 4px;
+      place-items: center;
+    }
+
+    .rail img {
+      width: 30px;
+      height: 30px;
+      transition: transform .15s;
+    }
+
+    .rail button:hover img {
+      transform: scale(1.12);
+    }
+
+    .spark {
+      position: absolute;
+      z-index: 2;
+      font-size: 15px;
+    }
+
+    .s1 { top: 1px; left: 4px; }
+    .s2 { top: 1px; left: 181px; }
+    .s3 { top: 15px; right: 140px; }
+    .s4 { right: 12px; bottom: 3px; }
+    .s5 { top: 35px; left: 7px; font-size: 10px; }
+    .s6 { top: 4px; left: 337px; font-size: 11px; }
+    .s7 { right: 4px; bottom: 30px; font-size: 10px; }
+    .s8 { bottom: 4px; left: 20px; font-size: 10px; }
+
+    .drawer {
+      position: absolute;
+      z-index: 10;
+      inset: 0 48px 0 207px;
+      display: none;
+      padding: 9px;
+      border: 2px solid white;
+      border-radius: 12px;
+      background: rgba(226, 248, 251, .97);
+      box-shadow: 0 2px 8px rgba(52, 118, 156, .4);
+    }
+
+    .drawer.show { display: block; }
+    .drawer h3 { margin: 0 0 8px; font-size: 13px; }
+
+    .drawer-close {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      border: 0;
+      background: none;
+      color: #2e7098;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .row {
+      display: flex;
+      margin-bottom: 7px;
+      gap: 5px;
+    }
+
+    input {
+      min-width: 0;
+      padding: 6px;
+      border: 1.5px solid #5aa7c4;
+      border-radius: 7px;
+      background: #fff;
+      color: #245c7d;
+      font: 11px Moon;
+      user-select: text;
+    }
+
+    #link,
+    #editUrl { flex: 1; }
+
+    .cute-btn,
+    .chip {
+      padding: 5px 8px;
+      border: 1.5px solid #3985a8;
+      border-radius: 7px;
+      background: #80cce2;
+      color: #164f73;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .pins {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .chip {
+      padding: 4px 6px;
+      background: #c9eff5;
+    }
+
+    .chip .x {
+      margin-left: 5px;
+      color: #b35275;
+    }
+
+    .editor {
+      display: none;
+      margin-top: 7px;
+    }
+
+    .editor.show { display: block; }
+    .status { min-height: 14px; font-size: 10px; }
+
+    .scene-controls {
+      display: grid;
+      gap: 7px;
+      font-size: 11px;
+    }
+
+    .switchline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fallback {
+      position: absolute;
+      z-index: 12;
+      inset: 5px;
+      display: none;
+      padding: 18px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      background: #e9efff;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .fallback.show { display: block; }
+
+    #player {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      overflow: hidden;
+      opacity: .01;
+      pointer-events: none;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <span class="spark s1">✦</span><span class="spark s2">✦</span>
+    <span class="spark s3">✧</span><span class="spark s4">✦</span>
+    <span class="spark s5">✦</span><span class="spark s6">✦</span>
+    <span class="spark s7">✦</span><span class="spark s8">✦</span>
+
+    <header class="header">
+      <span class="twinkle">✦</span>
+      <span class="wordmark">moon prism radio</span>
+      <div class="window-buttons">
+        <button id="minimize" title="Minimize">−</button>
+        <button id="maximize" title="Toggle always on top">□</button>
+        <button id="close" title="Quit">×</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="scene" id="scene">
+        <video src="pond.mp4" poster="pond.png" autoplay muted loop playsinline aria-label="Pixel pond with ducks"></video>
+        <img id="sceneGif" alt="Custom scene">
+      </div>
+
+      <section class="info">
+        <div class="title-row">
+          <div class="track-title" id="trackTitle">moon prism radio</div>
+          <button class="heart" id="heart" title="Pin current track">♡</button>
+        </div>
+        <div class="artist" id="artist">music for dreaming</div>
+        <div class="progress">
+          <span id="elapsed">--:--</span>
+          <div class="bar" id="progressBar">
+            <div class="fill" id="progressFill"></div>
+            <img class="knob" id="progressKnob" src="icon-star.png" alt="">
+          </div>
+          <span id="duration">--:--</span>
+        </div>
+
+        <div class="transport">
+          <button id="shuffle" title="Shuffle pins" aria-label="Shuffle pins">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4c5 0 7 14 12 14h5"/><path d="M20 17l4 4-4 4"/><path d="M3 21h4c2.5 0 4-3.5 5.5-7"/><path d="M17 7h7"/><path d="M20 3l4 4-4 4"/></g></svg>
+          </button>
+          <button id="previous" title="Previous pin" aria-label="Previous pin">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M7 5v18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M22 5L9 14l13 9z" fill="currentColor"/></svg>
+          </button>
+          <button class="primary" id="pauseBtn" title="Play or pause" aria-label="Play or pause">
+            <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3l13 9L7 21z" fill="currentColor"/></svg>
+            <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="5" height="18" rx="1.5" fill="currentColor"/><rect x="14" y="3" width="5" height="18" rx="1.5" fill="currentColor"/></svg>
+          </button>
+          <button id="next" title="Next pin" aria-label="Next pin">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M21 5v18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M6 5l13 9-13 9z" fill="currentColor"/></svg>
+          </button>
+          <button id="repeat" title="Repeat" aria-label="Repeat">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13a5 5 0 015 5"/><path d="M21 3l4 4-4 4"/><path d="M21 21H8a5 5 0 01-5-5"/><path d="M7 25l-4-4 4-4"/></g></svg>
+          </button>
+        </div>
+      </section>
+
+      <nav class="rail">
+        <button data-drawer="sceneDrawer" title="Scene settings" aria-label="Scene settings">
+          <img src="icon-duck.png" alt="">
+        </button>
+        <button data-drawer="pinsDrawer" title="Pinned links" aria-label="Pinned links">
+          <img src="icon-star.png" alt="">
+        </button>
+        <button data-drawer="musicDrawer" title="Play a link" aria-label="Play a link">
+          <img src="icon-note.png" alt="">
+        </button>
+      </nav>
+
+      <section class="drawer" id="musicDrawer">
+        <button class="drawer-close">×</button>
+        <h3>play a link ♫</h3>
+        <div class="row"><input id="link" placeholder="YouTube or SoundCloud link…"><button class="cute-btn" id="play">play</button></div>
+        <div class="status" id="status">paste a song to begin</div>
+      </section>
+
+      <section class="drawer" id="pinsDrawer">
+        <button class="drawer-close">×</button>
+        <h3>favorite stations ★</h3>
+        <div class="pins" id="pins"></div>
+        <div class="editor" id="editor">
+          <div class="row"><input id="editName" maxlength="20" placeholder="name"><input id="editUrl" placeholder="link"></div>
+          <button class="cute-btn" id="editSave">save</button>
+          <button class="cute-btn" id="editCancel">cancel</button>
+        </div>
+      </section>
+
+      <section class="drawer" id="sceneDrawer">
+        <button class="drawer-close">×</button>
+        <h3>cozy corner ♡</h3>
+        <div class="scene-controls">
+          <button class="cute-btn" id="gifBtn">choose scene image / gif</button>
+          <button class="cute-btn" id="clearGif">restore duck pond</button>
+          <label class="switchline">always on top <input type="checkbox" id="pin" checked></label>
+        </div>
+      </section>
+
+      <input id="gifFile" class="hidden" type="file" accept="image/gif,image/png,image/webp,image/jpeg">
+      <div id="player"></div>
+      <div class="fallback" id="fallback">
+        <p>this one is embed-locked ♡<br>try a SoundCloud version or open it below</p>
+        <button class="cute-btn" id="openExternal">open in my browser</button>
+      </div>
+    </main>
+
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
