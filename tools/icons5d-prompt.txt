@@ -1,0 +1,22 @@
+You are generating desktop icons using your image generation tool. The FIRST attached image is the EXACT style reference sheet. The other attached images (folder.png, text-x-generic.png, computer.png, terminal.png, chat.png) are icons ALREADY made for this set — new icons must look like siblings of them: same outline weight, same shadow offset, same gradient, same proportions and padding. The style is: flat, cute, retro "Y2K desktop" sticker-style icons. Match it EXACTLY:
+- thick rounded dark-brown outline (about #5b2d1e), same outline weight as the reference
+- fills are either warm cream (#fdf1d8) or a soft diagonal gradient from pink/lavender (#e9a6e0) to peach-yellow (#f9d27a), exactly like the reference
+- a solid dark-brown hard drop shadow offset down and to the right, no blur
+- simple, chunky, friendly shapes; smooth vector look (NOT pixel art), no textures, no extra details, no text (except where an item explicitly allows a symbol or letters)
+
+Rules for every file:
+- Generate one image per item, one after another. Don't stop early. If a generation fails, retry once.
+- Background MUST be fully transparent (alpha 0) — not the purple grid, not white, not checkerboard. If the generator returns an opaque background, remove it with python3 + PIL (flood-fill the background colour from the corners to alpha 0, tolerance ~40), then verify mode is RGBA and all four corner pixels have alpha 0.
+- Crop to the non-transparent bounding box, then pad to a SQUARE canvas with the icon centred and ~6% transparent margin. Keep native resolution (at least 512x512; don't downscale).
+- Save to ./out/ with the exact filename requested.
+- At the end, print each saved file with its PIL size and mode.
+
+ITEMS (each a single icon, centred, same visual weight as the attached sibling icons):
+1. out/steam_icon_294570.png — a cute round gradient cartoon fish with big friendly eyes, pouty cream lips and small fins (a kids' adventure game fish).
+2. out/steam_icon_294660.png — a cute little gradient cartoon convertible car seen from the front-side, with big cream headlight eyes and a smiling grille.
+3. out/rlogo_icon.png — a cream elliptical ring (tilted) with a chunky gradient capital letter "R" in front of it (this letter is allowed).
+4. out/rstudio.png — a gradient circle with a chunky cream capital letter "R" inside (this letter is allowed).
+5. out/balena-etcher.png — a chunky gradient isometric cube with cream edges highlight and a small cream SD card on its front face.
+6. out/idle.png — a cute coiled gradient snake with a cream belly, big friendly eyes and a tiny tongue, sitting on a small cream code window.
+
+These are app icons shown at 48-96 px, so keep shapes bold and simple, with few details. Each must be clearly distinguishable from the others.

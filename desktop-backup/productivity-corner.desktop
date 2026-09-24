@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Productivity Corner
+GenericName=Productivity Dashboard
+Comment=Cozy kawaii productivity dashboard — habits, gamified stats, gifs & more
+Exec=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/productivity-corner/launch.sh
+Icon=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/productivity-corner/icon.png
+Terminal=false
+Categories=Utility;
+StartupNotify=false
+StartupWMClass=productivity-corner
+Keywords=habits;productivity;dashboard;planner;corner;

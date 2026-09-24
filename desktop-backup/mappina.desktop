@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Mappina
+GenericName=Geography Trainer
+Comment=Cozy kawaii geography corner — flags, capitals & country-naming games with Marco the map-cat
+Exec=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/mappina-corner/launch.sh
+Icon=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/mappina-corner/icon.png
+Terminal=false
+Categories=Education;Geography;
+StartupNotify=false
+StartupWMClass=mappina-corner
+Keywords=geography;countries;flags;capitals;world;map;mappina;quiz;marco;
