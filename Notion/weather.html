@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-1: #ffe5ec;
+    --bg-2: #ffd1dc;
+    --ink: #8b3a5a;
+    --accent: #ff8fab;
+    --soft: rgba(255,255,255,0.7);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Pixelify Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 14px;
+  }
+
+  .weather-card {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(145deg, var(--bg-1), var(--bg-2));
+    color: var(--ink);
+    border: 4px solid var(--ink);
+    border-radius: 18px;
+    box-shadow:
+      0 5px 0 var(--ink),
+      0 10px 22px rgba(139, 58, 90, 0.15);
+    position: relative;
+    overflow: hidden;
+    padding: 16px;
+  }
+
+  /* Drifting cloud decorations */
+  .cloud-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    z-index: 0;
+  }
+  .cloud-bg span {
+    position: absolute;
+    font-size: 18px;
+    animation: drift 18s linear infinite;
+  }
+  .cloud-bg span:nth-child(1) { top: 10%; left: -10%; animation-duration: 22s; }
+  .cloud-bg span:nth-child(2) { top: 55%; left: -20%; animation-duration: 30s; font-size: 14px; }
+  .cloud-bg span:nth-child(3) { top: 75%; left: -15%; animation-duration: 26s; }
+  @keyframes drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(550px); }
+  }
+
+  /* Corner sparkles */
+  .sparkle-deco {
+    position: absolute;
+    font-size: 10px;
+    color: var(--ink);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .sparkle-deco.tl { top: 6px; left: 10px; }
+  .sparkle-deco.tr { top: 6px; right: 10px; font-size: 12px; }
+  .sparkle-deco.bl { bottom: 6px; left: 10px; font-size: 8px; }
+  .sparkle-deco.br { bottom: 6px; right: 12px; font-size: 9px; }
+
+  /* ----- HEADER ----- */
+  .header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  .location {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ink);
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+  .label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+  }
+
+  /* ----- CURRENT ----- */
+  .current {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 4px 12px;
+  }
+  .current-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--soft);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 0 var(--ink);
+    padding: 6px;
+  }
+  .current-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .current-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .temp {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1;
+    text-shadow: 2px 2px 0 rgba(255,255,255,0.6);
+  }
+  .temp .unit {
+    font-size: 14px;
+    vertical-align: top;
+    margin-left: 2px;
+  }
+  .condition {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 14px;
+    margin-top: 6px;
+    opacity: 0.85;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ----- ADVICE ----- */
+  .advice {
+    position: relative;
+    z-index: 2;
+    background: var(--accent);
+    color: white;
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 7px 10px;
+    margin: 4px 4px 12px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 rgba(139, 58, 90, 0.3);
+    box-shadow: 0 2px 0 var(--ink);
+  }
+
+  /* ----- FORECAST ----- */
+  .forecast {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 2px dashed rgba(139, 58, 90, 0.3);
+  }
+  .day {
+    background: var(--soft);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    padding: 8px 4px 6px;
+    text-align: center;
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .day-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .day-icon {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto 4px;
+  }
+  .day-icon svg {
+    width: 100%; height: 100%;
+  }
+  .day-temps {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1.4;
+  }
+  .day-temps .hi { color: var(--ink); }
+  .day-temps .lo { opacity: 0.55; }
+
+  /* ----- STATES ----- */
+  .loading, .error {
+    text-align: center;
+    padding: 30px 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+    color: var(--ink);
+    position: relative;
+    z-index: 2;
+  }
+  .loading::after {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    margin-left: 6px;
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="weather-card" id="card">
+    <div class="cloud-bg">
+      <span>☁</span><span>☁</span><span>☁</span>
+    </div>
+
+    <span class="sparkle-deco tl">✦</span>
+    <span class="sparkle-deco tr">✧</span>
+    <span class="sparkle-deco bl">✦</span>
+    <span class="sparkle-deco br">✧</span>
+
+    <div class="loading" id="loading">LOADING...</div>
+    <div class="error hidden" id="error">COULDN'T LOAD<br>WEATHER :(</div>
+
+    <div class="content hidden" id="content">
+      <div class="header">
+        <div class="location" id="location">PADOVA</div>
+        <div class="label">WEATHER</div>
+      </div>
+
+      <div class="current">
+        <div class="current-icon" id="currentIcon"></div>
+        <div class="current-info">
+          <div class="temp"><span id="currentTemp">--</span><span class="unit" id="unit">°C</span></div>
+          <div class="condition" id="condition">—</div>
+        </div>
+      </div>
+
+      <div class="advice" id="advice">—</div>
+
+      <div class="forecast" id="forecast"></div>
+    </div>
+  </div>
+
+<script>
+  // ---------- Config ----------
+  const params = new URLSearchParams(window.location.search);
+  const cityParam = params.get('city') || 'Padova';
+  const colorParam = params.get('color') || 'rose';
+  const unitParam = (params.get('unit') || 'C').toUpperCase();
+
+  // Known city shortcuts (lat, lng, display name)
+  const cities = {
+    padova:   { lat: 45.4064, lng: 11.8768, name: 'PADOVA' },
+    padua:    { lat: 45.4064, lng: 11.8768, name: 'PADUA' },
+    venice:   { lat: 45.4408, lng: 12.3155, name: 'VENICE' },
+    milan:    { lat: 45.4642, lng: 9.1900,  name: 'MILAN' },
+    rome:     { lat: 41.9028, lng: 12.4964, name: 'ROME' },
+    london:   { lat: 51.5074, lng: -0.1278, name: 'LONDON' },
+    paris:    { lat: 48.8566, lng: 2.3522,  name: 'PARIS' },
+    nyc:      { lat: 40.7128, lng: -74.0060, name: 'NEW YORK' },
+    'new york': { lat: 40.7128, lng: -74.0060, name: 'NEW YORK' },
+    istanbul: { lat: 41.0082, lng: 28.9784, name: 'ISTANBUL' },
+  };
+
+  // Themes (same palette as the D&D widgets)
+  const themes = {
+    rose:      { bg1: '#ffe5ec', bg2: '#ffd1dc', ink: '#8b3a5a', accent: '#ff8fab' },
+    mint:      { bg1: '#e0f5e9', bg2: '#c5ebd1', ink: '#2d6a4f', accent: '#74c69d' },
+    butter:    { bg1: '#fff4d2', bg2: '#ffe8a8', ink: '#9a6a1f', accent: '#f4b942' },
+    sky:       { bg1: '#dbeefe', bg2: '#bcdffb', ink: '#2c5282', accent: '#63a4e0' },
+    lavender:  { bg1: '#ede2ff', bg2: '#dcc8fc', ink: '#5b3a8e', accent: '#a78bfa' },
+    bubblegum: { bg1: '#ffd6eb', bg2: '#ffb3d9', ink: '#a83464', accent: '#ec4899' },
+    peach:     { bg1: '#ffe4cc', bg2: '#ffcfa3', ink: '#a04a1f', accent: '#fb923c' },
+    sage:      { bg1: '#e8f0e0', bg2: '#cfdfba', ink: '#556b2f', accent: '#9caf88' },
+  };
+  const theme = themes[colorParam] || themes.rose;
+  const root = document.documentElement.style;
+  root.setProperty('--bg-1', theme.bg1);
+  root.setProperty('--bg-2', theme.bg2);
+  root.setProperty('--ink', theme.ink);
+  root.setProperty('--accent', theme.accent);
+
+  // ---------- SVG weather icons (smooth illustrations) ----------
+  function renderIcon(name) {
+    const accent = theme.accent;
+    const ink = theme.ink;
+    const sun = '#f4c842';
+    const sunGlow = '#fff7d6';
+    const rain = '#6ba8d6';
+    const lightning = '#f4c842';
+
+    // Reusable cloud (origin at translate point, ~50w x 30h around it)
+    const cloud = (cx, cy, scale = 1) => `
+      <g transform="translate(${cx},${cy}) scale(${scale})">
+        <ellipse cx="0" cy="8" rx="24" ry="9" fill="${accent}"/>
+        <circle cx="-14" cy="0" r="9" fill="${accent}"/>
+        <circle cx="0" cy="-7" r="13" fill="${accent}"/>
+        <circle cx="14" cy="0" r="10" fill="${accent}"/>
+        <ellipse cx="-9" cy="-10" rx="3.5" ry="2.2" fill="rgba(255,255,255,0.5)" transform="rotate(-25 -9 -10)"/>
+        <ellipse cx="6" cy="-13" rx="2.5" ry="1.6" fill="rgba(255,255,255,0.5)" transform="rotate(-15 6 -13)"/>
+      </g>`;
+
+    const svgWrap = (content) =>
+      `<svg viewBox="0 0 64 64" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">${content}</svg>`;
+
+    switch (name) {
+      case 'sunny':
+        return svgWrap(`
+          <g stroke="${sun}" stroke-width="3.5" stroke-linecap="round">
+            <line x1="32" y1="4" x2="32" y2="13"/>
+            <line x1="32" y1="51" x2="32" y2="60"/>
+            <line x1="4" y1="32" x2="13" y2="32"/>
+            <line x1="51" y1="32" x2="60" y2="32"/>
+            <line x1="12" y1="12" x2="18" y2="18"/>
+            <line x1="46" y1="46" x2="52" y2="52"/>
+            <line x1="52" y1="12" x2="46" y2="18"/>
+            <line x1="18" y1="46" x2="12" y2="52"/>
+          </g>
+          <circle cx="32" cy="32" r="13" fill="${sun}"/>
+          <ellipse cx="28" cy="28" rx="4" ry="3" fill="${sunGlow}"/>
+        `);
+
+      case 'cloudy':
+        return svgWrap(cloud(32, 36, 1.1));
+
+      case 'partly':
+        return svgWrap(`
+          <g stroke="${sun}" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="4" x2="18" y2="9"/>
+            <line x1="4" y1="20" x2="9" y2="20"/>
+            <line x1="7" y1="9" x2="11" y2="13"/>
+            <line x1="29" y1="9" x2="25" y2="13"/>
+          </g>
+          <circle cx="18" cy="20" r="9" fill="${sun}"/>
+          <ellipse cx="15" cy="17" rx="2.5" ry="2" fill="${sunGlow}"/>
+          ${cloud(36, 42, 0.9)}
+        `);
+
+      case 'rain':
+        return svgWrap(`
+          ${cloud(32, 24, 0.95)}
+          <g fill="${rain}">
+            <ellipse cx="18" cy="46" rx="2.2" ry="4"/>
+            <ellipse cx="32" cy="49" rx="2.2" ry="4"/>
+            <ellipse cx="46" cy="46" rx="2.2" ry="4"/>
+            <ellipse cx="25" cy="57" rx="2.2" ry="4"/>
+            <ellipse cx="39" cy="57" rx="2.2" ry="4"/>
+          </g>
+        `);
+
+      case 'snow':
+        return svgWrap(`
+          ${cloud(32, 24, 0.95)}
+          <g fill="#ffffff" stroke="${ink}" stroke-width="0.8">
+            <circle cx="18" cy="46" r="2.6"/>
+            <circle cx="32" cy="50" r="2.6"/>
+            <circle cx="46" cy="46" r="2.6"/>
+            <circle cx="25" cy="58" r="2.2"/>
+            <circle cx="39" cy="58" r="2.2"/>
+          </g>
+        `);
+
+      case 'storm':
+        return svgWrap(`
+          ${cloud(32, 24, 0.95)}
+          <path d="M 38 32 L 22 48 L 30 48 L 24 60 L 42 42 L 32 42 Z"
+                fill="${lightning}" stroke="${ink}" stroke-width="1.5" stroke-linejoin="round"/>
+        `);
+
+      case 'fog':
+        return svgWrap(`
+          <g stroke="${accent}" stroke-width="5" stroke-linecap="round" fill="none">
+            <line x1="10" y1="22" x2="54" y2="22"/>
+            <line x1="16" y1="34" x2="48" y2="34"/>
+            <line x1="10" y1="46" x2="54" y2="46"/>
+          </g>
+        `);
+
+      default:
+        return svgWrap(cloud(32, 36, 1));
+    }
+  }
+
+  // ---------- WMO weather code → icon + label ----------
+  // https://open-meteo.com/en/docs (Weather variables, WMO codes)
+  function codeToWeather(code) {
+    if (code === 0) return { icon: 'sunny', label: 'Clear sky' };
+    if (code === 1) return { icon: 'partly', label: 'Mostly clear' };
+    if (code === 2) return { icon: 'partly', label: 'Partly cloudy' };
+    if (code === 3) return { icon: 'cloudy', label: 'Overcast' };
+    if (code === 45 || code === 48) return { icon: 'fog', label: 'Foggy' };
+    if (code >= 51 && code <= 57) return { icon: 'rain', label: 'Drizzle' };
+    if (code >= 61 && code <= 67) return { icon: 'rain', label: 'Rainy' };
+    if (code >= 71 && code <= 77) return { icon: 'snow', label: 'Snowy' };
+    if (code >= 80 && code <= 82) return { icon: 'rain', label: 'Rain showers' };
+    if (code === 85 || code === 86) return { icon: 'snow', label: 'Snow showers' };
+    if (code >= 95) return { icon: 'storm', label: 'Thunderstorm' };
+    return { icon: 'cloudy', label: '—' };
+  }
+
+  // ---------- Fetch ----------
+  function getCoords() {
+    const latParam = parseFloat(params.get('lat'));
+    const lngParam = parseFloat(params.get('lng'));
+    if (!isNaN(latParam) && !isNaN(lngParam)) {
+      return {
+        lat: latParam,
+        lng: lngParam,
+        name: (params.get('city') || 'Custom').toUpperCase()
+      };
+    }
+    const key = cityParam.toLowerCase();
+    if (cities[key]) return cities[key];
+    return cities.padova;
+  }
+
+  async function loadWeather() {
+    const coords = getCoords();
+    document.getElementById('location').textContent = coords.name;
+    const tempUnit = unitParam === 'F' ? 'fahrenheit' : 'celsius';
+    document.getElementById('unit').textContent = unitParam === 'F' ? '°F' : '°C';
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}` +
+      `&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min` +
+      `&temperature_unit=${tempUnit}&timezone=auto&forecast_days=2`;
+
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('http');
+      const data = await r.json();
+      renderWeather(data);
+    } catch (e) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error').classList.remove('hidden');
+    }
+  }
+
+  // ---------- Weather advice ----------
+  // Returns a cute friendly tip based on temp (always in °C internally) and code
+  function getAdvice(tempC, code) {
+    // Severe / precipitation first — these override temperature advice
+    if (code >= 95) return "stay cozy inside! ⛈️";
+    if (code === 85 || code === 86) return "snow showers — boots! ❄️";
+    if (code >= 71 && code <= 77) return "bundle up, it's snowing! ❄️";
+    if (code >= 80 && code <= 82) return "raincoat day! 🌧️";
+    if (code >= 61 && code <= 67) return "grab an umbrella! ☔";
+    if (code >= 51 && code <= 57) return "light drizzle — hood up ☂️";
+    if (code === 45 || code === 48) return "foggy — take care! 🌫️";
+
+    // Otherwise temperature-based
+    if (tempC < 0) return "freezing! layer up! 🧣";
+    if (tempC < 8) return "chilly — coat weather 🧥";
+    if (tempC < 14) return "light jacket weather 🧶";
+    if (tempC < 19) return "perfect for a walk! 🌿";
+    if (tempC < 24) return "lovely — dress weather! 👗";
+    if (tempC < 29) return "perfect for shorts! 🩳";
+    return "hot! hydrate lots! 💧";
+  }
+
+  function renderWeather(data) {
+    // Current
+    const curTemp = Math.round(data.current.temperature_2m);
+    const cur = codeToWeather(data.current.weather_code);
+    document.getElementById('currentTemp').textContent = curTemp;
+    document.getElementById('condition').textContent = cur.label;
+    document.getElementById('currentIcon').innerHTML = renderIcon(cur.icon);
+
+    // Advice — always compute in °C
+    const tempC = unitParam === 'F' ? (curTemp - 32) * 5 / 9 : curTemp;
+    document.getElementById('advice').textContent = getAdvice(tempC, data.current.weather_code);
+
+    // 2-day forecast: today (i=0) and tomorrow (i=1)
+    const labels = ['TODAY', 'TMRW'];
+    const forecastEl = document.getElementById('forecast');
+    forecastEl.innerHTML = '';
+    for (let i = 0; i <= 1; i++) {
+      const hi = Math.round(data.daily.temperature_2m_max[i]);
+      const lo = Math.round(data.daily.temperature_2m_min[i]);
+      const w = codeToWeather(data.daily.weather_code[i]);
+      const el = document.createElement('div');
+      el.className = 'day';
+      el.innerHTML = `
+        <div class="day-name">${labels[i]}</div>
+        <div class="day-icon">${renderIcon(w.icon)}</div>
+        <div class="day-temps">
+          <span class="hi">${hi}°</span> <span class="lo">${lo}°</span>
+        </div>
+      `;
+      forecastEl.appendChild(el);
+    }
+
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('content').classList.remove('hidden');
+  }
+
+  loadWeather();
+  // Refresh every 30 min if the tab stays open
+  setInterval(loadWeather, 30 * 60 * 1000);
+</script>
+</body>
+</html>
