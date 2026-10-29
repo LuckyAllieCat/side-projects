@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Allie & Berk's Travels ✨</title>
+<title>Our Travels ✨</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
@@ -268,7 +268,7 @@
     align-items: center;
     animation: bobWalk 0.5s ease-in-out infinite;
   }
-  .cat-wrap.berk { animation-delay: -0.25s; }
+  .cat-wrap.right { animation-delay: -0.25s; }
   @keyframes bobWalk {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-3px); }
@@ -435,13 +435,13 @@
 
   <!-- Cats -->
   <div class="cats">
-    <div class="cat-wrap allie">
-      <div class="cat-name">ALLIE</div>
-      <svg class="cat-svg" id="catAllie" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="cat-wrap left">
+      <div class="cat-name" id="nameLeft">ME</div>
+      <svg class="cat-svg" id="catLeft" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
-    <div class="cat-wrap berk">
-      <div class="cat-name">BERK</div>
-      <svg class="cat-svg" id="catBerk" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="cat-wrap right">
+      <div class="cat-name" id="nameRight">YOU</div>
+      <svg class="cat-svg" id="catRight" viewBox="0 0 60 44" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </div>
 
@@ -522,8 +522,12 @@
             stroke-linejoin="round"/>
     `;
   }
-  document.getElementById('catAllie').innerHTML = buildCat('#ff8fab');
-  document.getElementById('catBerk').innerHTML  = buildCat('#f5ebd6');
+  document.getElementById('catLeft').innerHTML  = buildCat('#ff8fab');
+  document.getElementById('catRight').innerHTML = buildCat('#f5ebd6');
+  // Optional names from the link, e.g. ?left=Ann&right=Bo
+  const nameParams = new URLSearchParams(window.location.search);
+  if (nameParams.get('left'))  document.getElementById('nameLeft').textContent  = nameParams.get('left').toUpperCase();
+  if (nameParams.get('right')) document.getElementById('nameRight').textContent = nameParams.get('right').toUpperCase();
 
   // ---------------- FLOWERS ----------------
   // Cute little flowers with varied colors, scattered along the ground

@@ -327,7 +327,7 @@
   <div class="main-row">
     <!-- LEFT PLAYER (RED / AMW) -->
     <div class="player left" id="playerLeft">
-      <div class="player-name">ALLIE MAE</div>
+      <div class="player-name">PLAYER 1</div>
       <div class="checker-wrap" id="leftChecker"></div>
       <div class="score" id="leftScore">0</div>
       <div class="pips" id="leftPips"></div>
@@ -342,7 +342,7 @@
 
     <!-- RIGHT PLAYER (CREAM / BY) -->
     <div class="player right" id="playerRight">
-      <div class="player-name">BERK</div>
+      <div class="player-name">PLAYER 2</div>
       <div class="checker-wrap" id="rightChecker"></div>
       <div class="score" id="rightScore">0</div>
       <div class="pips" id="rightPips"></div>
@@ -364,8 +364,8 @@
 
   // ---------- Config ----------
   const target = parseInt(params.get('target')) || 5;
-  const leftName = (params.get('left') || 'Allie Mae').toUpperCase();
-  const rightName = (params.get('right') || 'Berk').toUpperCase();
+  const leftName = (params.get('left') || 'Player 1').toUpperCase();
+  const rightName = (params.get('right') || 'Player 2').toUpperCase();
   const storageKey = 'tavla:' + (params.get('key') || 'default');
 
   document.querySelector('#playerLeft .player-name').textContent = leftName;
@@ -434,8 +434,8 @@
     svg += `<rect x="${barX - barW / 2}" y="2" width="0.6" height="${H - 4}" fill="#5c3a24"/>`;
     svg += `<rect x="${barX + barW / 2 - 0.6}" y="2" width="0.6" height="${H - 4}" fill="#5c3a24"/>`;
 
-    // ---------- Pixel dice in the middle of the board (Berk side) ----------
-    // Two dice, both on the right (Berk) half, diagonally offset for a casual look
+    // ---------- Pixel dice in the middle of the board (right side) ----------
+    // Two dice, both on the right half, diagonally offset for a casual look
     function drawDie(x, y, size, value, rotation = 0) {
       const cx = x + size / 2;
       const cy = y + size / 2;
@@ -460,7 +460,7 @@
     }
 
     const dieSize = 7;
-    // Both dice on right (Berk) half. Diagonal offset, slight rotation for casual feel.
+    // Both dice on right half. Diagonal offset, slight rotation for casual feel.
     // Right half spans from (barX + barW/2) to (W - 2)
     const rightInnerStart = barX + barW / 2 + 2;
     const rightInnerEnd = W - 2;
