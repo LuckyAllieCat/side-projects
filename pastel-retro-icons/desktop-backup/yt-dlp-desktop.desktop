@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=yt-dlp Desktop
+Comment=Download videos, playlists, and audio
+Exec=/home/luckyalliecat/PycharmProjects/yt-dlp-gui/run.sh
+Icon=/home/luckyalliecat/PycharmProjects/yt-dlp-gui/yt-dlp-desktop.svg
+Terminal=false
+Categories=AudioVideo;
+Keywords=YouTube;video;audio;download;yt-dlp;
+StartupNotify=true
+StartupWMClass=YtDlpDesktop

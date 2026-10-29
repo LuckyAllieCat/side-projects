@@ -1,0 +1,22 @@
+You are generating desktop icons using your image generation tool. The FIRST attached image is the EXACT style reference sheet. The other attached images (folder.png, text-x-generic.png, computer.png, terminal.png, chat.png) are icons ALREADY made for this set — new icons must look like siblings of them: same outline weight, same shadow offset, same gradient, same proportions and padding. The style is: flat, cute, retro "Y2K desktop" sticker-style icons. Match it EXACTLY:
+- thick rounded dark-brown outline (about #5b2d1e), same outline weight as the reference
+- fills are either warm cream (#fdf1d8) or a soft diagonal gradient from pink/lavender (#e9a6e0) to peach-yellow (#f9d27a), exactly like the reference
+- a solid dark-brown hard drop shadow offset down and to the right, no blur
+- simple, chunky, friendly shapes; smooth vector look (NOT pixel art), no textures, no extra details, no text (except where an item explicitly allows a symbol or letters)
+
+Rules for every file:
+- Generate one image per item, one after another. Don't stop early. If a generation fails, retry once.
+- Background MUST be fully transparent (alpha 0) — not the purple grid, not white, not checkerboard. If the generator returns an opaque background, remove it with python3 + PIL (flood-fill the background colour from the corners to alpha 0, tolerance ~40), then verify mode is RGBA and all four corner pixels have alpha 0.
+- Crop to the non-transparent bounding box, then pad to a SQUARE canvas with the icon centred and ~6% transparent margin. Keep native resolution (at least 512x512; don't downscale).
+- Save to ./out/ with the exact filename requested.
+- At the end, print each saved file with its PIL size and mode.
+
+ITEMS (each a single icon, centred, same visual weight as the attached sibling icons):
+1. out/org.gnome.FileRoller.png — a gradient zip-up pouch/archive box with a cream zipper running down the middle and a small pull tab.
+2. out/org.gnome.font-viewer.png — a cream rounded square tile showing chunky gradient letters "Aa" with dark-brown outline (these letters are allowed).
+3. out/org.gnome.Loupe.png — a chunky gradient magnifying glass whose cream lens shows a tiny picture of a hill and a yellow sun.
+4. out/org.gnome.seahorse.Application.png — a chunky gradient old-fashioned key with a heart-shaped bow (cream heart hole).
+5. out/org.gnome.SimpleScan.png — a gradient flatbed scanner with its cream lid slightly open and a yellow light strip.
+6. out/google-chrome.png — a round ball split into three gradient swirl segments around a cream ring and a dark-brown centre circle (a cute take on a browser ball).
+
+These are app icons shown at 48-96 px, so keep shapes bold and simple, with few details. Each must be clearly distinguishable from the others.

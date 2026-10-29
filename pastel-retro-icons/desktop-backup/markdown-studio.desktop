@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Markdown Studio
+GenericName=Markdown Converter
+Comment=Convert Markdown to clean HTML or a properly typeset PDF
+Exec=/home/luckyalliecat/Apps/MarkdownStudio/run.sh %f
+Icon=/home/luckyalliecat/Apps/MarkdownStudio/assets/icon.png
+Terminal=false
+Categories=Office;
+MimeType=text/markdown;text/x-markdown;
+Keywords=markdown;md;pdf;html;convert;
+StartupNotify=true

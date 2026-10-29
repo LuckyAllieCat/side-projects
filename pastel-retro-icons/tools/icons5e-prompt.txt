@@ -1,0 +1,24 @@
+You are generating desktop icons using your image generation tool. The FIRST attached image is the EXACT style reference sheet. The other attached images (folder.png, text-x-generic.png, computer.png, terminal.png, chat.png) are icons ALREADY made for this set — new icons must look like siblings of them: same outline weight, same shadow offset, same gradient, same proportions and padding. The style is: flat, cute, retro "Y2K desktop" sticker-style icons. Match it EXACTLY:
+- thick rounded dark-brown outline (about #5b2d1e), same outline weight as the reference
+- fills are either warm cream (#fdf1d8) or a soft diagonal gradient from pink/lavender (#e9a6e0) to peach-yellow (#f9d27a), exactly like the reference
+- a solid dark-brown hard drop shadow offset down and to the right, no blur
+- simple, chunky, friendly shapes; smooth vector look (NOT pixel art), no textures, no extra details, no text (except where an item explicitly allows a symbol or letters)
+
+Rules for every file:
+- Generate one image per item, one after another. Don't stop early. If a generation fails, retry once.
+- Background MUST be fully transparent (alpha 0) — not the purple grid, not white, not checkerboard. If the generator returns an opaque background, remove it with python3 + PIL (flood-fill the background colour from the corners to alpha 0, tolerance ~40), then verify mode is RGBA and all four corner pixels have alpha 0.
+- Crop to the non-transparent bounding box, then pad to a SQUARE canvas with the icon centred and ~6% transparent margin. Keep native resolution (at least 512x512; don't downscale).
+- Save to ./out/ with the exact filename requested.
+- At the end, print each saved file with its PIL size and mode.
+
+ITEMS (each a single icon, centred, same visual weight as the attached sibling icons):
+1. out/critterbox.png — a cream retro app window with a gradient title bar and a small heart, inside it two tiny cute critters side by side: one blocky square critter and one round blob critter (both gradient-filled).
+2. out/angolino.png — an open gradient book with cream pages and a small cream speech bubble floating above it containing a tiny heart (language learning).
+3. out/mappina.png — a folded cream paper map with gradient land patches and a small gradient map pin shaped like a cat head.
+4. out/quadernino.png — a closed gradient notebook with a cream label on the cover and three small cream section tabs sticking out of the right edge.
+5. out/scacchino.png — a chunky gradient chess knight piece on a cream base, with a tiny cat ear on its head and a small heart.
+6. out/tavlacik.png — an open backgammon board seen from above: gradient frame, cream board with dark-brown and gradient triangles, two round checkers on it.
+7. out/pokepal.png — a cute chunky gradient five-point wish-star with a smiling face, rosy cheeks and a short sparkle trail.
+8. out/markdown-studio.png — a cream page with a folded top-right corner showing a chunky dark-brown letter "M" next to a gradient down arrow (the letter M is allowed).
+
+These are app icons shown at 48-96 px, so keep shapes bold and simple, with few details. Each must be clearly distinguishable from the others.

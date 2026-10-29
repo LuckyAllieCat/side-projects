@@ -1,0 +1,23 @@
+You are generating desktop icons using your image generation tool. The FIRST attached image is the EXACT style reference sheet. The other attached images (folder.png, text-x-generic.png, computer.png, terminal.png, chat.png) are icons ALREADY made for this set — new icons must look like siblings of them: same outline weight, same shadow offset, same gradient, same proportions and padding. The style is: flat, cute, retro "Y2K desktop" sticker-style icons. Match it EXACTLY:
+- thick rounded dark-brown outline (about #5b2d1e), same outline weight as the reference
+- fills are either warm cream (#fdf1d8) or a soft diagonal gradient from pink/lavender (#e9a6e0) to peach-yellow (#f9d27a), exactly like the reference
+- a solid dark-brown hard drop shadow offset down and to the right, no blur
+- simple, chunky, friendly shapes; smooth vector look (NOT pixel art), no textures, no extra details, no text (except where an item explicitly allows a symbol or letters)
+
+Rules for every file:
+- Generate one image per item, one after another. Don't stop early. If a generation fails, retry once.
+- Background MUST be fully transparent (alpha 0) — not the purple grid, not white, not checkerboard. If the generator returns an opaque background, remove it with python3 + PIL (flood-fill the background colour from the corners to alpha 0, tolerance ~40), then verify mode is RGBA and all four corner pixels have alpha 0.
+- Crop to the non-transparent bounding box, then pad to a SQUARE canvas with the icon centred and ~6% transparent margin. Keep native resolution (at least 512x512; don't downscale).
+- Save to ./out/ with the exact filename requested.
+- At the end, print each saved file with its PIL size and mode.
+
+ITEMS (each a single icon, centred, same visual weight as the attached sibling icons):
+1. out/snap-store.png — a gradient shopping bag with cream handles and a cream star on the front.
+2. out/discord.png — a cute chunky gradient game-controller-shaped mascot face with two cream oval eyes and a small smile.
+3. out/proton-mail.png — a gradient closed envelope with a round cream wax-seal padlock in the centre of the flap.
+4. out/proton-vpn-logo.png — a gradient globe with latitude lines and a small cream padlock badge at the bottom-right.
+5. out/slack.png — four chunky rounded gradient pill shapes arranged in a pinwheel/hash pattern, each with a round end.
+6. out/whatsapp.png — a round gradient speech bubble with a tail at the bottom-left and a cream phone handset inside.
+7. out/steam.png — a round gradient badge with a cream mechanical linkage: a big cream circle and a small cream circle joined by a chunky bar.
+
+These are app icons shown at 48-96 px, so keep shapes bold and simple, with few details. Each must be clearly distinguishable from the others.

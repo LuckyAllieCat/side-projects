@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=PokePal
+GenericName=Desktop Buddy
+Comment=Stellina — a wish-star that wanders your screen edges
+Exec=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/pokepal/launch.sh
+Icon=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/pokepal/pokepal.png
+Terminal=false
+Categories=Utility;
+StartupNotify=false
+Keywords=pet;widget;buddy;pokepal;stellina;

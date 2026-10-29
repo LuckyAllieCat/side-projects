@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Lang Learn App
+GenericName=Language Learning
+Comment=Lang Learn App — language learning (IT · RU · TK)
+Exec=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/Lang_Learn_App/desktop/launch.sh
+Icon=/home/luckyalliecat/PycharmProjects/Desktop_Widgets/Lang_Learn_App/icon.png
+Terminal=false
+Categories=Education;
+StartupNotify=false
+StartupWMClass=angolino
+Keywords=language;italian;learning;angolino;study;

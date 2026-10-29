@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Moon Prism Radio
+GenericName=Music Widget
+Comment=Tiny always-on-top widget for YouTube & SoundCloud, magical-girl edition
+Exec=/home/luckyalliecat/PycharmProjects/moon-prism-radio/launch.sh
+Icon=/home/luckyalliecat/PycharmProjects/moon-prism-radio/moon.png
+Terminal=false
+Categories=AudioVideo;
+StartupNotify=false
+StartupWMClass=moon-prism-radio
+Keywords=music;radio;youtube;soundcloud;widget;moon;

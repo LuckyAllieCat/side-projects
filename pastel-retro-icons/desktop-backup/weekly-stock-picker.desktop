@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Weekly Stock Picker
+GenericName=Stock Picker
+Comment=Suggests where to invest each week's budget and tracks your portfolio
+Exec=/home/luckyalliecat/PycharmProjects/stock-picker/run.sh
+Icon=/home/luckyalliecat/PycharmProjects/stock-picker/stock-picker-icon.png
+Terminal=false
+Categories=Office;Finance;
+Keywords=stocks;invest;portfolio;market;finance;money;shares;
+StartupNotify=true
+StartupWMClass=Weeklystockpicker
